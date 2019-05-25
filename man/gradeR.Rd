@@ -15,8 +15,8 @@ gradeR(submission_dir, your_test_file)
 This function grades a bunch of R script assignments
 }
 \examples{
-submissions <- "~/gradeR/assignment1_submissions/"
-my_test_file <- "~/gradeR/my_tests/grade_hw1.R"
+submissions <- "/path/to/assignment1_submissions/"
+my_test_file <- "/another/path/my_tests/grade_hw1.R"
 results <- gradeR(submissions, my_test_file)
 }
-\keyword{cats}
+\keyword{grader}

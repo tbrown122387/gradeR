@@ -1,2 +1,5 @@
 ^gradeR\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^Meta$
+^README\.Rmd$

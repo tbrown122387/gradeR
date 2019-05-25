@@ -1,22 +1,23 @@
-#library(testthat)
-#submission_dir <- "~/gradeR/assignment1_submissions/"
-#your_test_file <- "~/gradeR/my_tests/grade_hw1.R"
-
-
 #' A grading function!
 #'
 #' This function grades a bunch of R script assignments 
 #' @param submission_dir where the assignments are located
 #' @param your_test_file the path to your testthat test file (e.g. grade_hw1.R)
-#' @keywords cats
+#' @keywords grader
 #' @export
 #' @examples
-#' submissions <- "~/gradeR/assignment1_submissions/"
-#' my_test_file <- "~/gradeR/my_tests/grade_hw1.R"
+#' submissions <- "/path/to/assignment1_submissions/"
+#' my_test_file <- "/another/path/my_tests/grade_hw1.R"
 #' results <- gradeR(submissions, my_test_file)
 gradeR <- function(submission_dir, your_test_file){
 
-  paths <- list.files(path = submission_dir, recursive = T)
+  if(missing(submission_dir) | missing(your_test_file)) 
+    stop("both arguments are required")
+  
+  paths <- list.files(path = submission_dir, 
+                      recursive = T, 
+                      pattern = "\\.r$", 
+                      ignore.case = T)
   number_questions <- length(test_file(your_test_file, reporter = "minimal"))
   number_students <- length(paths)
   score_data <- data.frame("id" = vector(mode = "character", length = 2), 
@@ -29,8 +30,7 @@ gradeR <- function(submission_dir, your_test_file){
     tmp_full_path <- paste(submission_dir, path, sep = "")    
     source(tmp_full_path)
     lr <- ListReporter$new()
-    out <- test_file("~/gradeR/my_tests/grade_hw1.R", 
-                     reporter = lr)
+    out <- test_file(your_test_file, reporter = lr)
     
     # parse the output
     score_data[student_num,1] <- tmp_full_path
@@ -50,7 +50,8 @@ gradeR <- function(submission_dir, your_test_file){
     # clear out all of the student's data from global environment
     rm(list=setdiff(ls(), 
                     c("path", "paths", "submission_dir", "student_num", 
-                      "number_questions", "number_students", "score_data")))
+                      "number_questions", "number_students", "score_data",
+                      "your_test_file")))
     
     # increment 
     student_num <- student_num + 1
