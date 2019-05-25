@@ -18,7 +18,7 @@ gradeR <- function(submission_dir, your_test_file){
                       recursive = T, 
                       pattern = "\\.r$", 
                       ignore.case = T)
-  number_questions <- length(test_file(your_test_file, reporter = "minimal"))
+  number_questions <- length(testthat::test_file(your_test_file, reporter = "minimal"))
   number_students <- length(paths)
   score_data <- data.frame("id" = vector(mode = "character", length = 2), 
                            matrix(data = "blank", nrow = number_students, 
@@ -30,7 +30,7 @@ gradeR <- function(submission_dir, your_test_file){
     tmp_full_path <- paste(submission_dir, path, sep = "")    
     source(tmp_full_path)
     lr <- ListReporter$new()
-    out <- test_file(your_test_file, reporter = lr)
+    out <- testthat::test_file(your_test_file, reporter = lr)
     
     # parse the output
     score_data[student_num,1] <- tmp_full_path
