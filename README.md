@@ -36,3 +36,5 @@ This is a basic example which shows you how to solve a common problem:
 #setwd("~/gradeR/example/")
 #grades <- gradeR("/path/to/assignment1_submissions/", "/path/to/grade_hw1.R")
 ```
+
+The directory of the first argument will be walked recursively, and any function ending in a `.R` or `.r` will be ran and tested. The file with the tests is given by the second argument. For more information on how to write `testthat` tests, see [this.](https://cran.r-project.org/web/packages/testthat/testthat.pdf)
