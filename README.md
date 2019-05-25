@@ -5,7 +5,7 @@ gradeR
 
 <!-- badges: start -->
 <!-- badges: end -->
-The goal of gradeR is to help grade bunches of R script assignment submissions. It is a one function package, and most of the functionality is taken from the `testthat` package.
+The goal of `gradeR` is to help grade bunches of `R` script assignment submissions. It is a one function package, and most of the functionality is taken from the `testthat` package.
 
 Installation
 ------------
@@ -19,7 +19,7 @@ Installation
 <!-- # install.packages("devtools") -->
 <!-- devtools::install_github("tbrown122387/gradeR") -->
 <!-- ``` -->
-You can install the development version of gradeR from with:
+You can install the development version of `gradeR` from with:
 
 ``` r
 # install.packages("devtools")
