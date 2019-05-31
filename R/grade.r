@@ -27,10 +27,15 @@ gradeR <- function(submission_dir, your_test_file){
   student_num <- 1
   for(path in paths ){
     
+    # run student's submission
     tmp_full_path <- paste(submission_dir, path, sep = "")    
-    source(tmp_full_path)
+    source(tmp_full_path, environment())
+    
+    # test the student's submissions
     lr <- ListReporter$new()
-    out <- testthat::test_file(your_test_file, reporter = lr)
+    out <- testthat::test_file(your_test_file, 
+                               reporter = lr,
+                               env = environment())
     
     # parse the output
     score_data[student_num,1] <- tmp_full_path
@@ -48,10 +53,11 @@ gradeR <- function(submission_dir, your_test_file){
     }
     
     # clear out all of the student's data from global environment
-    rm(list=setdiff(ls(), 
-                    c("path", "paths", "submission_dir", "student_num", 
-                      "number_questions", "number_students", "score_data",
-                      "your_test_file")))
+    rm(list = setdiff(ls(environment()), 
+                      c("path", "paths", "submission_dir", 
+                        "student_num", "number_questions", 
+                        "number_students", "score_data",
+                        "your_test_file", "path")), envir = environment())
     
     # increment 
     student_num <- student_num + 1
