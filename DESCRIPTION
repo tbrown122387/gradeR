@@ -1,9 +1,9 @@
 Package: gradeR
-Title: Help grade R script assignment submissions!
-Version: 0.0.0.9000
+Title: Help Grade R Script Assignment Submissions!
+Version: 1.0.0
 Authors@R: person("Taylor", "Brown", email = "trb5me@virginia.edu", role = c("aut", "cre"))
 Description: This is a single function R package that helps grade students' R script assignment submissions. This function finds every .R file in a directory, runs it, and tests variables are what they are expected to be.
-Depends: R (>= 3.4.4)
+Depends: R (>= 3.4)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

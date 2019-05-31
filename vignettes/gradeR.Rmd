@@ -1,0 +1,19 @@
+---
+title: "gradeR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{gradeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(gradeR)
+```

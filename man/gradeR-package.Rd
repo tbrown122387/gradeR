@@ -4,7 +4,7 @@
 \name{gradeR-package}
 \alias{gradeR}
 \alias{gradeR-package}
-\title{gradeR: Help grade R script assignment submissions!}
+\title{gradeR: Help Grade R Script Assignment Submissions!}
 \description{
 This is a single function R package that helps grade students' R script assignment submissions. This function finds every .R file in a directory, runs it, and tests variables are what they are expected to be.
 }

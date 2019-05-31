@@ -9,7 +9,7 @@ calcGrades(submission_dir, your_test_file)
 \arguments{
 \item{submission_dir}{where the assignments are located}
 
-\item{your_test_file}{the path to your testthat test file (e.g. grade_hw1.R)}
+\item{your_test_file}{the path to your `testthat` test file (e.g. `grade_hw1.R`)}
 }
 \description{
 This function grades a bunch of R script assignments
