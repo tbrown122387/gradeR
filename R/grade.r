@@ -3,13 +3,16 @@
 #' This function grades a bunch of R script assignments 
 #' @param submission_dir where the assignments are located
 #' @param your_test_file the path to your testthat test file (e.g. grade_hw1.R)
-#' @keywords grader
+#' @keywords calcGrades
 #' @export
 #' @examples
-#' submissions <- "/path/to/assignment1_submissions/"
-#' my_test_file <- "/another/path/my_tests/grade_hw1.R"
-#' results <- gradeR(submissions, my_test_file)
-gradeR <- function(submission_dir, your_test_file){
+#' \dontrun{
+#' # change paths to *your* paths
+#' submissions <- "example/assignment1_submissions/"
+#' my_test_file <- "example/grade_hw1.R"
+#' results <- calcGrades(submissions, my_test_file)
+#' }
+calcGrades <- function(submission_dir, your_test_file){
 
   if(missing(submission_dir) | missing(your_test_file)) 
     stop("both arguments are required")
@@ -32,7 +35,7 @@ gradeR <- function(submission_dir, your_test_file){
     source(tmp_full_path, environment())
     
     # test the student's submissions
-    lr <- ListReporter$new()
+    lr <- testthat::ListReporter$new()
     out <- testthat::test_file(your_test_file, 
                                reporter = lr,
                                env = environment())
@@ -42,7 +45,7 @@ gradeR <- function(submission_dir, your_test_file){
     for(q in (1:number_questions)){
       
       # true or false if question was correct
-      success <- is(lr$results$as_list()[[q]]$results[[1]],"expectation_success") 
+      success <- methods::is(lr$results$as_list()[[q]]$results[[1]],"expectation_success") 
       
       # TODO incorporate point values
       if(success){

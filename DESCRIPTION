@@ -4,12 +4,13 @@ Version: 0.0.0.9000
 Authors@R: person("Taylor", "Brown", email = "trb5me@virginia.edu", role = c("aut", "cre"))
 Description: This is a single function R package that helps grade students' R script assignment submissions. This function finds every .R file in a directory, runs it, and tests variables are what they are expected to be.
 Depends: R (>= 3.4.4)
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Imports:
-    testthat
+    testthat,
+    methods
 Suggests: 
     knitr,
     rmarkdown
