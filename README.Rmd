@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of `gradeR` is to help grade bunches of `R` script assignment submissions. It is a one function package (`calcGrades()`), and most of the functionality is taken from the `testthat` package.
+The goal of `gradeR` is to help grade bunches of `R` script assignment submissions. This package has one function (`calcGrades()`), and most of the testing functionality is taken from the `testthat` package.
 
 ## Installation
 
@@ -51,5 +51,5 @@ This is a basic example which shows you how to solve a common problem. Make sure
 #grades <- calcGrades("/path/to/assignment1_submissions/", "/path/to/grade_hw1.R")
 ```
 
-The directory of the first argument will be walked recursively, and any function ending in a `.R` or `.r` will be ran and tested. The file with the tests is given by the second argument. For more information on how to write `testthat` tests, see [this.](https://cran.r-project.org/web/packages/testthat/testthat.pdf) 
+The directory of the first argument will be walked recursively, and any file ending in a `.R` or `.r` will be `source`d and tested. The file with the tests is specified in the second argument. This is a file you must create on your own. For more information on how to write `testthat` tests, see [this.](https://cran.r-project.org/package=testthat) 
 
