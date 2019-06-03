@@ -4,9 +4,9 @@
 \name{gradeR-package}
 \alias{gradeR}
 \alias{gradeR-package}
-\title{gradeR: Help Grade R Script Assignment Submissions!}
+\title{gradeR: Helps Grade Assignment Submissions that are R Scripts}
 \description{
-This is a single function R package that helps grade students' R script assignment submissions. This function finds every .R file in a directory, runs it, and tests variables are what they are expected to be.
+After being given the location of your students' submissions and a test file, the function runs each .R file, and evaluates the results from all the given tests. Results are neatly returned in a data frame that has a row for each student, and a column for each test.
 }
 \author{
 \strong{Maintainer}: Taylor Brown \email{trb5me@virginia.edu}
