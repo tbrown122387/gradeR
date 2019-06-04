@@ -15,10 +15,10 @@ calcGrades(submission_dir, your_test_file)
 This function grades a bunch of R script assignments
 }
 \examples{
-\dontrun{
+\donttest{
 # change paths to *your* paths
-submissions <- "example/assignment1_submissions/"
-my_test_file <- "example/grade_hw1.R"
+submissions <- "extdata/assignment1_submissions/"
+my_test_file <- system.file("extdata", "grade_hw1.R", package = "gradeR")
 results <- calcGrades(submissions, my_test_file)
 }
 }
