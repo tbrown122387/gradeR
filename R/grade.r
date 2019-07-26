@@ -66,6 +66,8 @@ calcGrades <- function(submission_dir, your_test_file){
     student_num <- student_num + 1
   }
   
+  # make the column names prettier before returning everything
+  colnames(score_data)[-1] <-  paste("q", as.character(1:number_questions), sep = "")
   return(score_data)
 }
 
