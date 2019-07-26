@@ -1,6 +1,6 @@
 Package: gradeR
 Title: Helps Grade Assignment Submissions that are R Scripts
-Version: 1.0.0
+Version: 1.0.0.9000
 Authors@R: person("Taylor", "Brown", email = "trb5me@virginia.edu", role = c("aut", "cre"))
 Description: After being given the location of your students' submissions and a test file, the function runs each .R file, and evaluates the results from all the given tests. Results are neatly returned in a data frame that has a row for each student, and a column for each test.
 Depends: R (>= 3.4)
