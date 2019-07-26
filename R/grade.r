@@ -23,7 +23,7 @@ calcGrades <- function(submission_dir, your_test_file){
                       ignore.case = T)
   number_questions <- length(testthat::test_file(your_test_file, reporter = "minimal"))
   number_students <- length(paths)
-  score_data <- data.frame("id" = vector(mode = "character", length = 2), 
+  score_data <- data.frame("id" = vector(mode = "character", length = number_students), 
                            matrix(data = "blank", nrow = number_students, 
                                   ncol = number_questions),
                            stringsAsFactors = F)
