@@ -2,6 +2,7 @@ context("Tests the one function")
 
 test_that("test missing args", {
 
+  # check that it throws error when you don't supply all arguments
   expect_error(calcGrades())
 
 
