@@ -14,13 +14,11 @@ package.
 
 ## Installation
 
-<!-- You can install the released version of gradeR from [CRAN](https://CRAN.R-project.org) with: -->
+You can install the released version of `gradeR` from [CRAN](https://CRAN.R-project.org) with:
 
-<!-- ``` r -->
-
-<!-- install.packages("gradeR") -->
-
-<!-- ``` -->
+``` r
+install.packages("gradeR")
+```
 
 <!-- And the development version from [GitHub](https://github.com/) with: -->
 
@@ -41,18 +39,22 @@ devtools::install_github("tbrown122387/gradeR")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem.
-Make sure to change the paths to ones that actually exist on your
-machine.
+This is a basic example which shows you how to grade a bunch of assignment submissions. Make sure to change the paths to ones that actually exist on your machine.
 
 ``` r
-#library(gradeR)
-#setwd("~/gradeR/example/")
-#grades <- calcGrades("/path/to/assignment1_submissions/", "/path/to/grade_hw1.R")
+library(gradeR)
+setwd("~/gradeR/example/")
+grades <- calcGrades("/path/to/assignment1_submissions/", "/path/to/grade_hw1.R")
 ```
 
 The directory of the first argument will be walked recursively, and any
-file ending in a `.R` or `.r` will be `source`d and tested. The file
-with the tests is specified in the second argument. This is a file you
-must create on your own. For more information on how to write `testthat`
+file ending in a `.R` or `.r` will be `source`d and tested. 
+
+The file with the tests is specified in the second argument. This is a file you must create on your own. For more information on how to write `testthat`
 tests, see [this.](https://cran.r-project.org/package=testthat)
+
+Note that it might be beneficial to recommend that your students:
+
+- `source` their `.R` submissions before sendig them over, to make sure everything at least runs on their machine.
+- to not rename filenames, or change raw data files (e.g. the `.csv` files)
+- to not use global file paths (have them interactively use `setwd()`)
