@@ -31,7 +31,8 @@ calcGrades <- function(submission_dir, your_test_file){
   for(path in paths ){
     
     # run student's submission
-    tmp_full_path <- paste(submission_dir, path, sep = "")    
+    tmp_full_path <- paste(submission_dir, path, sep = "")  
+    cat("now running the script ", tmp_full_path, "\n")
     source(tmp_full_path, environment())
     
     # test the student's submissions
