@@ -21,10 +21,11 @@ calcGrades <- function(submission_dir, your_test_file){
                       recursive = T, 
                       pattern = "\\.r$", 
                       ignore.case = T)
-  number_questions <- length(testthat::test_file(your_test_file, reporter = "minimal"))
+  number_questions <- length(testthat::test_file(your_test_file, 
+                                                 reporter = "minimal"))
   number_students <- length(paths)
   score_data <- data.frame("id" = vector(mode = "character", length = number_students), 
-                           matrix(data = "blank", nrow = number_students, 
+                           matrix(data = 0, nrow = number_students, 
                                   ncol = number_questions),
                            stringsAsFactors = F)
   student_num <- 1
@@ -32,7 +33,7 @@ calcGrades <- function(submission_dir, your_test_file){
     
     # run student's submission
     tmp_full_path <- paste(submission_dir, path, sep = "")  
-    cat("now running the script ", tmp_full_path, "\n")
+    cat("Now grading: ",  path, "\n")
     source(tmp_full_path, environment())
     
     # test the student's submissions
@@ -50,9 +51,9 @@ calcGrades <- function(submission_dir, your_test_file){
       
       # TODO incorporate point values
       if(success){
-        score_data[student_num, q+1] <- "1"
+        score_data[student_num, q+1] <- 1
       }else{
-        score_data[student_num, q+1] <- "0"
+        score_data[student_num, q+1] <- 0
       }
     }
     
@@ -69,6 +70,7 @@ calcGrades <- function(submission_dir, your_test_file){
   
   # make the column names prettier before returning everything
   colnames(score_data)[-1] <-  paste("q", as.character(1:number_questions), sep = "")
+  
   return(score_data)
 }
 
