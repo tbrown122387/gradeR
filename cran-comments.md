@@ -5,10 +5,8 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 1 notes
 
-* This is a new release.
+## added features
 
-## bug fix
-
-I fixed one big regarding the function being called with an odd number of submissions. I also added another test that tests to make sure it works with an odd number of submissions.
+The call to `source` is now wrapped in `tryCatch` for added durability. Also, points are now numeric vectors instead of character vectors.

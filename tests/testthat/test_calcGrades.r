@@ -11,9 +11,9 @@ test_that("test missing args", {
   results <- calcGrades(submissions, my_test_file)
   expect_equal(results[1,1], "example/assignment1_submissions/student1/hw1.R")
   expect_equal(results[2,1], "example/assignment1_submissions/student2/myhw1.r")
-  expect_equal(results[1,2], "1")
-  expect_equal(results[2,2], "0")
-  expect_equal(results[1,3], "1")
-  expect_equal(results[2,3], "1")
+  expect_equal(results[1,2], 1)
+  expect_equal(results[2,2], 0)
+  expect_equal(results[1,3], 1)
+  expect_equal(results[2,3], 1)
 
 })

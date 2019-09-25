@@ -28,13 +28,20 @@ calcGrades <- function(submission_dir, your_test_file){
                            matrix(data = 0, nrow = number_students, 
                                   ncol = number_questions),
                            stringsAsFactors = F)
+  
   student_num <- 1
   for(path in paths ){
     
     # run student's submission
     tmp_full_path <- paste(submission_dir, path, sep = "")  
-    cat("Now grading: ",  path, "\n")
-    source(tmp_full_path, environment())
+    #source(tmp_full_path, environment())
+    tmp <- tryCatch({
+      source(tmp_full_path, environment())
+    }, error = function(e) {
+      cat("Unable to run: ",  path, "\n")
+    }, warning = function(w){
+      cat("Produced a warning: ", path, "\n")
+    })
     
     # test the student's submissions
     lr <- testthat::ListReporter$new()
