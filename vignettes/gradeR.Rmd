@@ -7,6 +7,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+## Introducing `gradeR` 
+
+The `gradeR` package helps grade your students's assignment submissions that are `R` Scripts (`.r` or `.R` files). If you have a large class, or you distribute assignments very often, then it can be tedious to run each student's file separately and/or judge program state or output manually. 
+
+Instead, this package allows you to write a single test file (that is also a `.r` file), which is used to test each student's submission file. After you write that file, you provide it to `gradeR`'s single function `calcGrades`, which also asks for the directory of student submissions. It will run each submission file it can find, and then run each the tests you provided on the output produced by the student's script. Results are then neatly returned in a data frame that has one row for each student, and a column for each test.
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -17,3 +23,173 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(gradeR)
 ```
+
+
+## How Must I Change My Distributed Assignments?
+
+All you have to do is ask your students to assign variables to specific names. Otherwise, each student might use different names for his/her variables, and that would make testing all of the assignments very challening. 
+
+For instance, if your assignment asks each student to
+
+>>> Generate a thousand random variates from a standard normal distribution.
+
+You will have to change the text of this to something like 
+
+>>> Generate a thousand random variates from a standard normal distribution and store the result as `myNormVariates`.
+
+That's it. However, there are also some recommended warnings you provide as well. The students will have to follow a few rules so that their assignments are gradeable. Their code should not:
+
+1. refer to file locations, paths, or directories (advise them to use `setwd()` interactively)
+
+2. do not alter any data sets at all (e.g. remove extraneous rows or columns, change certain values manually, or rename files).
+
+3. variables that are going to be tested cannot be destroyed or overwritten at any point in the program. 
+
+Regarding 1., because you are running their code on **your** machine, if a student's submission tries to run the following:
+
+```
+myDf <- read.csv("/Users/johndoe/i_am_a_student/STATS101/hw1/dataset.csv")
+```
+
+it is unlikely that path will exist on your machine, and so `calcGrades` will tell you that the assignment is not gradeable. Instead, the student should write code like this
+
+```
+# I remembered to comment out setwd before I submitted :)
+# setwd("/Users/johndoe/i_am_a_student/STATS101/hw1/") 
+myDf <- read.csv("dataset.csv")
+```
+
+In this way, their submissions will not require any intervention on the instructor's part. 
+
+Regarding 2., if they are reading in a data set that is different than the one you distributed to the class, their code will not be reproduced on your machine. 
+
+Number 3. is more subtle. If you ask your students to, say, create a data frame with three columns called `myDataFrame`, and then, in a later question, you ask them to overwrite that data frame by adding a fourth column to it, you, the instructor, will not be able to test the initial data frame with three columns. This is due to how `calcGrades` works--it runs/`source`s the entire student script from start to finish, and then applies the tests. It does not intermittently run tests sprinkled inside a student submission. You should also remind the students not to accidentally overwrite variables.
+
+## How Do I Write Tests?
+
+This package relies on that [`testthat` package](https://testthat.r-lib.org/). `gradeR` makes use of `testthat`'s  ["expectations"](https://testthat.r-lib.org/reference/index.html). Most of the time you will be testing if certain variables are what you expect them to be. 
+
+Say for instance, you ask a student to create a variable called `a`. This variable will be the result of some process they are supposed to figure out. You, the instructor, having completed the assignment yourself, know that the correct answer is `3`. So, this question could have the following test:
+
+```
+test_that("1.1a",{
+  expect_true(a == 3)
+})
+```
+
+Alternatively, you could have written 
+
+```
+test_that("1.1a",{
+  expect_equal(a, 3)
+})
+```
+
+For a complete list of all available `expect_*` functions, see [`testthat`'s documentation](https://testthat.r-lib.org/reference/index.html).
+
+
+## A Fully-Worked Example
+
+Here's an example of an entire hypothetical assignment. The following files are `fake_hw1.pdf`, `data.csv`, `assignment1_test_file.r`, and all of the student submissions. They might be organized on your hard drive as follows:
+
+```
+├── distributed_assignment
+│   ├── data.csv
+│   ├── fake_hw1.pdf
+├── grading_resources
+│   ├── assignment1_test_file.r
+└── submissions
+    ├── jane_doe_hw1_submission.r
+    └── john_doe_assignment1.r
+```
+
+This is what `fake_hw1.pdf` looks like. It's the set of instructions given to each students.
+
+```{r, out.width = "400px", include=TRUE, fig.align="center", echo=F}
+knitr::include_graphics("example/distributed_assignment/screenshot.png")
+```
+
+The external data set `data.csv` is also distributed to students. In this case, it looks like this:
+```
+a,b,c
+1,2,3
+4,5,700.01
+```
+
+The test file you create would look similar to this file, `assignment1_test_file.r`:
+
+```
+library(testthat)
+
+setwd("~/path/to/where/dataset/is/")
+
+# first test
+test_that("first", {
+  
+  expect_equal( sum(myVector), 6) 
+
+  })
+
+# second test
+test_that("second", {
+
+  expect_true(is.character(myString))
+  expect_true(nchar(myString) > 2)
+
+})
+
+# third test
+test_that("third", {
+
+  expect_equal(nrow(myDataFrame), 2)
+  expect_equal(myDataFrame[1,1], 700.01, tolerance=1e-3)
+
+})
+```
+
+This hypothetical class is very small, and it has only two students. These two students made the following submissions: first, `jane_doe_hw1_submission.r`:
+
+```
+# Jane Doe's assignment 1
+# Aug. 8 2019
+# STAT 101
+
+# question 1
+myVector <- 1:3
+
+# question 2
+myString <- "Jane Doe"
+
+# question 3
+myDataFrame <- read.csv("data.csv")
+```
+and second, `john_doe_assignment1.r`:
+
+```
+# John Doe's assignment 1
+
+# question 1
+myVector <- c(1,2,3)
+
+# question 2
+# I had a little trouble with this one!
+
+# question 3
+myDataFrame <- read.csv("data.csv")
+```
+
+And that's that! There aren't any more files that are required. The rest is just code you type into the console interactively. It might look something like this: 
+
+```
+# load in the package
+library(gradeR)
+
+# this is the directory with all of the student submissions
+submissionDir <- "../submissions/"
+
+# get the grades
+grades <- calcGrades(submission_dir = submissionDir, 
+                     your_test_file = "~/this/should/be/your/correct/path/assignment1_grading_file.r")
+```
+
+From there, you can do whatever you want. For instance, you can take the sum/average of all the questions they get correct, weight different questions by different amounts, apply a curve, calculate which percentage of students got each question correct, make histograms of the grades, etc.
