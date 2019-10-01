@@ -38,9 +38,15 @@ calcGrades <- function(submission_dir, your_test_file){
     tmp <- tryCatch({
       source(tmp_full_path, environment())
     }, error = function(e) {
+      
       cat("Unable to run: ",  path, "\n")
+      cat("Error message: \n")
+      message(e)
+      cat("\n")
     }, warning = function(w){
       cat("Produced a warning: ", path, "\n")
+      message(w)
+      cat("\n")
     })
     
     # test the student's submissions
