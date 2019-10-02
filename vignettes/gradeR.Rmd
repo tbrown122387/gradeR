@@ -27,7 +27,7 @@ library(gradeR)
 
 ## How Must I Change My Distributed Assignments?
 
-All you have to do is ask your students to assign variables to specific names. Otherwise, each student might use different names for his/her variables, and that would make testing all of the assignments very challening. 
+All you have to do is ask your students to assign variables to specific names. Otherwise, each student might use different names for his/her variables, and that would make testing all of the assignments very challenging. 
 
 For instance, if your assignment asks each student to
 
@@ -37,7 +37,7 @@ You will have to change the text of this to something like
 
 >>> Generate a thousand random variates from a standard normal distribution and store the result as `myNormVariates`.
 
-That's it. However, there are also some recommended warnings you provide as well. The students will have to follow a few rules so that their assignments are gradeable. Their code should not:
+That's it. However, there are also some recommended warnings you provide as well. The students will have to follow a few rules so that their assignments can be graded. Their code should not:
 
 1. refer to file locations, paths, or directories (advise them to use `setwd()` interactively)
 
@@ -51,7 +51,7 @@ Regarding 1., because you are running their code on **your** machine, if a stude
 myDf <- read.csv("/Users/johndoe/i_am_a_student/STATS101/hw1/dataset.csv")
 ```
 
-it is unlikely that path will exist on your machine, and so `calcGrades` will tell you that the assignment is not gradeable. Instead, the student should write code like this
+it is unlikely that path will exist on your machine, and so `calcGrades` will tell you that the assignment is not able to be graded. Instead, the student should write code like this
 
 ```
 # I remembered to comment out setwd before I submitted :)

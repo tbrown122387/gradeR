@@ -1,3 +1,9 @@
+# gradeR 1.0.3
+
+## Extra things
+
+-added a vignette with a fully-worked example
+
 # gradeR 1.0.2
 
 ## Extra things

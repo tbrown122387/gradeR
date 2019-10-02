@@ -5,7 +5,9 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 notes
+I just released a package to you the other day, but I forgot to change the vignette! That's the only change. Sorry for splitting it up and making it a bit more messy.
+
+0 errors | 0 warnings | 0 notes
 
 ## added features
 
