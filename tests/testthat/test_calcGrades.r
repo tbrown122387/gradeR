@@ -8,7 +8,7 @@ test_that("test missing args", {
 
   submissions <- "example/assignment1_submissions/"
   my_test_file <- "example/grade_hw1.R"
-  results <- calcGrades(submissions, my_test_file)
+  results <- calcGrades(submissions,my_test_file, TRUE)
   expect_equal(results[1,1], "example/assignment1_submissions/student1/hw1.R")
   expect_equal(results[2,1], "example/assignment1_submissions/student2/myhw1.r")
   expect_equal(results[1,2], 1)

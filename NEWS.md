@@ -1,3 +1,9 @@
+# gradeR 1.0.4
+
+## Extra things
+
+-warnings that get triggered by running student submission can now be ignored.
+
 # gradeR 1.0.3
 
 ## Extra things
