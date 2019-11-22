@@ -2,9 +2,10 @@
 % Please edit documentation in R/grade.r
 \name{calcGrades}
 \alias{calcGrades}
-\title{A grading function.}
+\title{The grading function.}
 \usage{
-calcGrades(submission_dir, your_test_file, suppress_warnings = TRUE)
+calcGrades(submission_dir, your_test_file, suppress_warnings = TRUE,
+  verbose = FALSE)
 }
 \arguments{
 \item{submission_dir}{where the assignments are located}
@@ -12,6 +13,8 @@ calcGrades(submission_dir, your_test_file, suppress_warnings = TRUE)
 \item{your_test_file}{the path to your testthat test file (e.g. grade_hw1.R)}
 
 \item{suppress_warnings}{warning handlers prevent code from being run after they catch something. Suppress this behavior by setting this argument to TRUE.}
+
+\item{verbose}{set to true if you want to print the name of the file as it's being ran}
 }
 \description{
 This function grades a bunch of R script assignments

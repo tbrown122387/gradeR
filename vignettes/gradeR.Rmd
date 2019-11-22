@@ -59,7 +59,7 @@ it is unlikely that path will exist on your machine, and so `calcGrades` will te
 myDf <- read.csv("dataset.csv")
 ```
 
-In this way, their submissions will not require any intervention on the instructor's part. 
+In this way, their submissions will not require any intervention on the instructor's part. If you would like to scan all of the student submissions for adherence to this rule, you can use the function `findGlobalPaths` (more on this later).
 
 Regarding 2., if they are reading in a data set that is different than the one you distributed to the class, their code will not be reproduced on your machine. 
 
@@ -67,7 +67,7 @@ Number 3. is more subtle. If you ask your students to, say, create a data frame 
 
 ## How Do I Write Tests?
 
-This package relies on that [`testthat` package](https://testthat.r-lib.org/). `gradeR` makes use of `testthat`'s  ["expectations"](https://testthat.r-lib.org/reference/index.html). Most of the time you will be testing if certain variables are what you expect them to be. 
+This package relies on the [`testthat` package](https://testthat.r-lib.org/). `gradeR` makes use of `testthat`'s  ["expectations"](https://testthat.r-lib.org/reference/index.html). Most of the time you will be testing if certain variables are what you expect them to be. 
 
 Say for instance, you ask a student to create a variable called `a`. This variable will be the result of some process they are supposed to figure out. You, the instructor, having completed the assignment yourself, know that the correct answer is `3`. So, this question could have the following test:
 
@@ -192,4 +192,9 @@ grades <- calcGrades(submission_dir = submissionDir,
                      your_test_file = "~/this/should/be/your/correct/path/assignment1_grading_file.r")
 ```
 
-From there, you can do whatever you want. For instance, you can take the sum/average of all the questions they get correct, weight different questions by different amounts, apply a curve, calculate which percentage of students got each question correct, make histograms of the grades, etc.
+From there, you can do whatever you want. For instance, you can take the sum/average of all the questions they get correct, weight different questions by different amounts, apply a curve, calculate which percentage of students got each question correct, make histograms of the grades, etc. 
+
+
+## Some Extra Functions
+
+Currently, there are two other functions in this package: `findGlobalPaths` and `findBadEncodingFiles`. After you have provided a submission directory, these functions will find all student submissions (files that end with `.R` or `.r`) and scan every line to see if there are any problems. Specifically, they will check for 1.) if any file refers to global/machine-specific file paths, and 2.) if any file has unreadable characters (non-UTF-8). In my experience, these are the two most common problems with student submissions. The second problem often arises when students copy/paste code from strange text editors, or when their keyboards type in multiple languages.

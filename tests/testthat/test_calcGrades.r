@@ -1,4 +1,4 @@
-context("Tests the one function")
+context("Tests the grading function")
 
 test_that("test missing args", {
 
