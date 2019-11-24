@@ -32,7 +32,7 @@ devtools::install_github("tbrown122387/gradeR")
 This is a basic overview which shows you how to grade a bunch of
 assignment submissions. Make sure to change the paths to ones that
 actually exist on your machine. For more details on this example, see
-the vignette.
+the [vignette](https://cran.r-project.org/package=gradeR/vignettes/gradeR.html).
 
 ``` r
 # load in the package
