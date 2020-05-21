@@ -10,7 +10,7 @@ LazyData: true
 RoxygenNote: 6.1.1
 Imports:
     testthat,
-    methods
+    methods,
     jsonlite
 Suggests: 
     knitr,
