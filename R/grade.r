@@ -229,7 +229,7 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
   }
   
   # now write out all the stuff to a json file
-  write(toJSON(tests, auto_unbox = T), file = json_filename)
+  write(jsonlite::toJSON(tests, auto_unbox = T), file = json_filename)
 }
 
 

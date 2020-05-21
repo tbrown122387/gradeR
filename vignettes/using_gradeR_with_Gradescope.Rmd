@@ -1,5 +1,5 @@
 ---
-title: "gradeR"
+title: "Using gradeR with Gradescope"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{gradeR}
@@ -7,9 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Introducing `gradeR` 
+## Introducing 
 
-The `gradeR` package helps grade your students's assignment submissions that are `R` Scripts (`.r` or `.R` files). If you have a large class, or you distribute assignments very often, then it can be tedious to run each student's file separately and/or judge program state or output manually. 
+The `gradeR` package helps grade your students's assignment submissions that are `R` Scripts (`.r` or `.R` files). If you want to use `gradeR` for grading submissions on your own laptop or desktop, please see the vignette [here.](https://cran.r-project.org/web/packages/gradeR/vignettes/gradeR.html). This vignette describes how to use the [Gradescope autograder](https://gradescope-autograders.readthedocs.io/en/latest/) with the help helper functions from this package.
+
 
 Instead, this package allows you to write a single test file (that is also a `.r` file), which is used to test each student's submission file. After you write that file, you provide it to `gradeR`'s single function `calcGrades`, which also asks for the directory of student submissions. It will run each submission file it can find, and then run each the tests you provided on the output produced by the student's script. Results are then neatly returned in a data frame that has one row for each student, and a column for each test.
 

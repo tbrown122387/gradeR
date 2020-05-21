@@ -11,6 +11,7 @@ RoxygenNote: 6.1.1
 Imports:
     testthat,
     methods
+    jsonlite
 Suggests: 
     knitr,
     rmarkdown
