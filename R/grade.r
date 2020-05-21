@@ -94,8 +94,13 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
                       recursive = T, 
                       pattern = "\\.r$", 
                       ignore.case = T)
+  
   number_questions <- length(testthat::test_file(your_test_file, 
                                                  reporter = "minimal"))
+  number_questions <- length(testthat::test_file(your_test_file, reporter = "minimal"))
+  if(number_questions == 0)
+    stop("You need at least one graded question")
+  
   number_students <- length(paths)
   score_data <- data.frame("id" = vector(mode = "character", length = number_students), 
                            matrix(data = 0, nrow = number_students, 
@@ -176,5 +181,55 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
 }
 
 
+
+#' The grading function for Gradescope.
+#'
+#' This function grades one R script assignment submission and writes results out to a properly-formatted json file for Gradescope. 
+#' @param submission_file the name of the assignment submission file (e.g. "hw1.r")
+#' @param test_file the name of the .r file with test_that tests (e.g. "hw1_tests.R")
+#' @param which_results Choose either "testing" or "gradescope" If equal to "gradescope" then the json file is written out to the directory that Gradescope expects. Otherwise, results.json is written to your current working directory.
+#' @keywords calcGradesForGradescope Gradescope 
+#' @export
+calcGradesForGradescope <- function(submission_file, test_file, which_results = "gradescope"){
+  
+  if(!(which_results %in% c("gradescope", "testing")))
+    stop("argument which_filename incorrectly specified")
+  json_filename <- ifelse(which_results == "gradescope", "/autograder/results/results.json", "results.json")
+  
+  if(missing(test_file)) 
+    stop("must have a test file")
+  
+  # TODO: add this to the other function
+  number_tests <- length(testthat::test_file(test_file, reporter = "minimal"))
+  if(number_tests == 0)
+    stop("you need at least one graded question")
+  
+  # run student's submission in a separate environment
+  testEnv <- new.env()
+  
+  # source each assignment
+  tryCatch(source(submission_file, testEnv),  error = function(c) c, warning = function(c) c ,message = function(c) c)
+  
+  # test the student's submissions
+  # for the time being, each test is worth one point
+  lr <- testthat::ListReporter$new()
+  out <- testthat::test_file(test_file, reporter = lr, env = testEnv)
+  tests <- list()
+  tests[["tests"]] <- list()
+  raw_results <- lr$results$as_list()
+  for(i in seq_along(number_tests)){
+    test_name <- raw_results[[i]]$test
+    test_visibility <- ifelse(grepl("\\(visible\\)", test_name), "visible", "hidden") # search for the exact phrase (visible)
+    test_max_score <- 1 # TODO generalize
+    test_score <- ifelse(methods::is(raw_results[[i]]$results[[1]], "expectation_success"), 1, 0)
+    tests[["tests"]][[i]] <- list(name = test_name,
+                                  score = test_score,
+                                  max_score = test_max_score,
+                                  visibility = test_visibility)
+  }
+  
+  # now write out all the stuff to a json file
+  write(toJSON(tests, auto_unbox = T), file = json_filename)
+}
 
 
