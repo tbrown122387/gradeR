@@ -4,8 +4,12 @@
 \alias{calcGrades}
 \title{The grading function.}
 \usage{
-calcGrades(submission_dir, your_test_file, suppress_warnings = TRUE,
-  verbose = FALSE)
+calcGrades(
+  submission_dir,
+  your_test_file,
+  suppress_warnings = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{submission_dir}{where the assignments are located}
