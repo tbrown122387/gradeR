@@ -1,8 +1,15 @@
+# gradeR 1.0.6
+
+## Extra things
+
+- added `calcGradesForGradescope` function, which helps grade assignments on the Gradescope platform
+- added `using_gradeR_with_Gradescope` a vignette for helping with the set up of Gradescope's autograder
+
 # gradeR 1.0.5
 
 ## Extra things
 
-- added `findGlobalPaths`, which searchs student submissions for the very bad global/machine-specific file paths
+- added `findGlobalPaths`, which searches student submissions for the very bad global/machine-specific file paths
 - added `findBadEncodingFiles`, which searchs student submissions for the very bad non-UTF-8 characters
 - added a `verbose` argument to `calcGrades`, so you can see which file is being ran in real time
 

@@ -81,8 +81,8 @@ findGlobalPaths <- function(submission_dir) {
 #' @examples
 #' \donttest{
 #' # change paths to *your* paths
-#' submissions <- "extdata/assignment1_submissions/"
-#' my_test_file <- system.file("extdata", "grade_hw1.R", package = "gradeR")
+#' submissions <- "extdata/example/assignment1_submissions/"
+#' my_test_file <- system.file("extdata/example", "grade_hw1.R", package = "gradeR")
 #' results <- calcGrades(submissions, my_test_file)
 #' }
 calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE, verbose = FALSE){
