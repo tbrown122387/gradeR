@@ -217,7 +217,7 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
   tests <- list()
   tests[["tests"]] <- list()
   raw_results <- lr$results$as_list()
-  for(i in seq_along(number_tests)){
+  for(i in 1:number_tests){
     test_name <- raw_results[[i]]$test
     test_visibility <- ifelse(grepl("\\(visible\\)", test_name), "visible", "hidden") # search for the exact phrase (visible)
     test_max_score <- 1 # TODO generalize
