@@ -5,7 +5,4 @@
 
 ## R CMD check results
 
-Added warning suppression optionality.
-
-0 errors | 0 warnings | 0 notes
-
+1 Note occurred. I have a .github directory which contains a yml file for a little button on my Github repo site.
