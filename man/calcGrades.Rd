@@ -26,8 +26,8 @@ This function grades a bunch of R script assignments
 \examples{
 \donttest{
 # change paths to *your* paths
-submissions <- "extdata/assignment1_submissions/"
-my_test_file <- system.file("extdata", "grade_hw1.R", package = "gradeR")
+submissions <- "extdata/example/assignment1_submissions/"
+my_test_file <- system.file("extdata/example", "grade_hw1.R", package = "gradeR")
 results <- calcGrades(submissions, my_test_file)
 }
 }
