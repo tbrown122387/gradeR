@@ -2,7 +2,7 @@
 title: "Using gradeR with Gradescope"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using gradeR with Gradescope}
+  <!-- %\VignetteIndexEntry{Using gradeR with Gradescope} -->
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
