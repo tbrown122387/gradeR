@@ -95,8 +95,6 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
                       pattern = "\\.r$", 
                       ignore.case = T)
   
-  number_questions <- length(testthat::test_file(your_test_file, 
-                                                 reporter = "minimal"))
   number_questions <- length(testthat::test_file(your_test_file, reporter = "minimal"))
   if(number_questions == 0)
     stop("You need at least one graded question")
@@ -153,7 +151,8 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
     for(q in (1:number_questions)){
       
       # true or false if question was correct
-      success <- methods::is(lr$results$as_list()[[q]]$results[[1]],"expectation_success") 
+      assertionResults <- lr$results$as_list()[[q]]$results
+      success <- all(sapply(assertionResults, methods::is, "expectation_success")) 
       
       # TODO incorporate point values
       if(success){
@@ -221,7 +220,9 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
     test_name <- raw_results[[i]]$test
     test_visibility <- ifelse(grepl("\\(visible\\)", test_name), "visible", "hidden") # search for the exact phrase (visible)
     test_max_score <- 1 # TODO generalize
-    test_score <- ifelse(methods::is(raw_results[[i]]$results[[1]], "expectation_success"), 1, 0)
+    assertionResults <- raw_results[[i]]$results
+    success <- all(sapply(assertionResults, methods::is, "expectation_success"))
+    test_score <- ifelse(success, 1, 0)
     tests[["tests"]][[i]] <- list(name = test_name,
                                   score = test_score,
                                   max_score = test_max_score,
