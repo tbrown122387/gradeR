@@ -1,7 +1,5 @@
 library(testthat)
 
-setwd("~/path/to/where/dataset/is/")
-
 # first test
 test_that("first", {
   
