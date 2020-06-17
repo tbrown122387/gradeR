@@ -121,8 +121,6 @@ The test file you create would look similar to this file, `assignment1_test_file
 ```
 library(testthat)
 
-setwd("~/path/to/where/dataset/is/")
-
 # first test
 test_that("first", {
   
@@ -193,6 +191,8 @@ grades <- calcGrades(submission_dir = submissionDir,
 ```
 
 From there, you can do whatever you want. For instance, you can take the sum/average of all the questions they get correct, weight different questions by different amounts, apply a curve, calculate which percentage of students got each question correct, make histograms of the grades, etc. 
+
+Keep it mind, though, that `data.csv` should be inside the directory/folder you're running this interactive code from. Otherwise, student code that attempts to read in data will fail because it won't be able to find the file. 
 
 
 ## Some Extra Functions
