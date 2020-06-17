@@ -18,7 +18,7 @@ Two bugs in the vignette were fixed as well. `data.csv` needed to be in the loca
 ## Extra things
 
 - added `findGlobalPaths`, which searches student submissions for the very bad global/machine-specific file paths
-- added `findBadEncodingFiles`, which searchs student submissions for the very bad non-UTF-8 characters
+- added `findBadEncodingFiles`, which searches student submissions for the very bad non-UTF-8 characters
 - added a `verbose` argument to `calcGrades`, so you can see which file is being ran in real time
 
 # gradeR 1.0.4
