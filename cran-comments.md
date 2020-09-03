@@ -5,4 +5,9 @@
 
 ## R CMD check results
 
-0 errors, 0 warnings, 0 notes
+0 errors, 0 warnings, 1 notes
+
+Regarding the one note:
+* checking for future file timestamps ... NOTE
+unable to verify current time
+I did some searching around on Google, and this seems to have to do with some website that no longer functions.
