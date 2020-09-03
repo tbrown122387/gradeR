@@ -110,7 +110,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
     
     # run student's submission
     tmp_full_path <- paste(submission_dir, path, sep = "")  
-    testEnv <- new.env()
+    testEnv <- new.env(parent = globalenv())
     if(suppress_warnings){
       tryCatch({
         if(verbose)
@@ -144,7 +144,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
     lr <- testthat::ListReporter$new()
     out <- testthat::test_file(your_test_file, 
                                reporter = lr,
-                               env = new.env(parent = testEnv))
+                               env = testEnv)
     
     # parse the output
     score_data[student_num,1] <- tmp_full_path
@@ -204,17 +204,20 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
     stop("you need at least one graded question")
   
   # run student's submission in a separate environment
-  testEnv <- new.env()
+  testEnv <- new.env(parent = globalenv())
   
   # source each assignment
-  tryCatch(source(submission_file, testEnv),  error = function(c) c, warning = function(c) c ,message = function(c) c)
+  tryCatch(source(submission_file, testEnv),  
+           error = function(c) c, 
+           warning = function(c) c,
+           message = function(c) c)
   
   # test the student's submissions
   # for the time being, each test is worth one point
   lr <- testthat::ListReporter$new()
   out <- testthat::test_file(test_file, 
                              reporter = lr, 
-                             env = new.env(parent = testEnv))
+                             env = testEnv)
   tests <- list()
   tests[["tests"]] <- list()
   raw_results <- lr$results$as_list()
