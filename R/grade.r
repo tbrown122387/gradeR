@@ -110,7 +110,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
     
     # run student's submission
     tmp_full_path <- paste(submission_dir, path, sep = "")  
-    testEnv <- new.env(parent = emptyenv())
+    testEnv <- new.env(parent = globalenv())
     if(suppress_warnings){
       tryCatch({
         if(verbose)
@@ -204,7 +204,7 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
     stop("you need at least one graded question")
   
   # run student's submission in a separate environment
-  testEnv <- new.env(parent = emptyenv())
+  testEnv <- new.env(parent = globalenv())
   
   # source each assignment
   tryCatch(source(submission_file, testEnv),  
