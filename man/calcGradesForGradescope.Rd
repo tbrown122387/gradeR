@@ -7,7 +7,8 @@
 calcGradesForGradescope(
   submission_file,
   test_file,
-  which_results = "gradescope"
+  which_results = "gradescope",
+  suppress_warnings = TRUE
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ calcGradesForGradescope(
 \item{test_file}{the name of the .r file with test_that tests (e.g. "hw1_tests.R")}
 
 \item{which_results}{Choose either "testing" or "gradescope" If equal to "gradescope" then the json file is written out to the directory that Gradescope expects. Otherwise, results.json is written to your current working directory.}
+
+\item{suppress_warnings}{If FALSE, warnings are fatal; if set to TRUE, then warnings will not prematurely terminate running of student submission scripts.}
 }
 \description{
 This function grades one R script assignment submission and writes results out to a properly-formatted json file for Gradescope.

@@ -187,9 +187,13 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
 #' @param submission_file the name of the assignment submission file (e.g. "hw1.r")
 #' @param test_file the name of the .r file with test_that tests (e.g. "hw1_tests.R")
 #' @param which_results Choose either "testing" or "gradescope" If equal to "gradescope" then the json file is written out to the directory that Gradescope expects. Otherwise, results.json is written to your current working directory.
+#' @param suppress_warnings If FALSE, warnings are fatal; if set to TRUE, then warnings will not prematurely terminate running of student submission scripts. 
 #' @keywords calcGradesForGradescope Gradescope 
 #' @export
-calcGradesForGradescope <- function(submission_file, test_file, which_results = "gradescope"){
+calcGradesForGradescope <- function(submission_file, 
+                                    test_file, 
+                                    which_results = "gradescope",
+                                    suppress_warnings = TRUE){
   
   if(!(which_results %in% c("gradescope", "testing")))
     stop("argument which_filename incorrectly specified")
@@ -207,10 +211,19 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
   testEnv <- new.env(parent = globalenv())
   
   # source each assignment
-  tryCatch(source(submission_file, testEnv),  
-           error = function(c) c, 
-           warning = function(c) c,
-           message = function(c) c)
+  if(suppress_warnings){
+    suppressWarnings(
+      tryCatch(source(submission_file, testEnv),  
+               error = function(c) c, 
+               warning = function(c) c,
+               message = function(c) c)
+    )
+  }else{
+    tryCatch(source(submission_file, testEnv),  
+             error = function(c) c, 
+             warning = function(c) c,
+             message = function(c) c)
+  }
   
   # test the student's submissions
   # for the time being, each test is worth one point
