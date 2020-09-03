@@ -214,7 +214,7 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
   lr <- testthat::ListReporter$new()
   out <- testthat::test_file(test_file, 
                              reporter = lr, 
-                             env = testEnv)
+                             env = new.env(parent = testEnv))
   tests <- list()
   tests[["tests"]] <- list()
   raw_results <- lr$results$as_list()
