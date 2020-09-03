@@ -144,7 +144,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
     lr <- testthat::ListReporter$new()
     out <- testthat::test_file(your_test_file, 
                                reporter = lr,
-                               env = testEnv)
+                               env = new.env(parent = testEnv))
     
     # parse the output
     score_data[student_num,1] <- tmp_full_path
@@ -212,7 +212,9 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
   # test the student's submissions
   # for the time being, each test is worth one point
   lr <- testthat::ListReporter$new()
-  out <- testthat::test_file(test_file, reporter = lr, env = testEnv)
+  out <- testthat::test_file(test_file, 
+                             reporter = lr, 
+                             env = testEnv)
   tests <- list()
   tests[["tests"]] <- list()
   raw_results <- lr$results$as_list()
