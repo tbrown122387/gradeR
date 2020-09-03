@@ -223,9 +223,17 @@ calcGradesForGradescope <- function(submission_file, test_file, which_results = 
   raw_results <- lr$results$as_list()
   for(i in 1:number_tests){
     test_name <- raw_results[[i]]$test
-    test_visibility <- ifelse(grepl("\\(visible\\)", test_name), 
-                              "visible", 
-                              "after_due_date") # search for the exact phrase (visible)
+    if(  grepl("\\(visible\\)", test_name) ){
+        test_visibility <- "visible"
+    }else if( grepl("\\(hidden\\)", test_name) ){
+        test_visibility <- "hidden"
+    }else if(  grepl("\\(after_due_date\\)", test_name) ){
+        test_visibility <- "after_due_date"
+    }else if( grepl("\\(after_published\\)", test_name) ){
+        test_visibility <- "after_published"
+    }else{
+        test_visibility <- "after_due_date"
+    }
     test_max_score <- 1 # TODO generalize
     assertionResults <- raw_results[[i]]$results
     success <- all(sapply(assertionResults, methods::is, "expectation_success"))
