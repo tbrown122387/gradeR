@@ -1,3 +1,12 @@
+# gradeR 1.0.8
+
+## Extra things
+
+A `suppress_warnings` argument was added to `calcGradesForGradescope`. Now you can choose whether or not warnings should be fatal when running student submission scripts.
+
+Second, more flexibility in specifying the [test visibility](https://gradescope-autograders.readthedocs.io/en/latest/specs/#output-format) has been added. Students can see the test results before the submission deadline, after the submission deadline but before the publish date, after the publish date, or never. 
+
+
 # gradeR 1.0.7
 
 ## Bug fixes
