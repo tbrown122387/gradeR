@@ -95,7 +95,8 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
                       pattern = "\\.r$", 
                       ignore.case = T)
   
-  number_questions <- length(testthat::test_file(your_test_file, reporter = "minimal"))
+  number_questions <- length(testthat::test_file(your_test_file, 
+                                                 reporter = "minimal"))
   if(number_questions == 0)
     stop("You need at least one graded question")
   
@@ -108,43 +109,59 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
   student_num <- 1
   for(path in paths ){
     
-    # run student's submission
+    # run student's submission in a separate process 
+    # https://stackoverflow.com/questions/63744905/attaching-packages-to-a-temporary-search-path-in-r/63746414#63746414
     tmp_full_path <- paste(submission_dir, path, sep = "")  
-    testEnv <- new.env(parent = globalenv())
-    if(suppress_warnings){
-      tryCatch({
-        if(verbose)
-          cat("grading: ", path, "\n")
-        suppressWarnings(source(tmp_full_path, testEnv))
-      }, error = function(e) {
-        
-        cat("Unable to run: ",  path, "\n")
-        cat("Error message: \n")
-        message(e)
-        cat("\n")
-      })
-    } else { #not suppressing warnings
-      tryCatch({
-        if(verbose)
-          cat("grading: ", path, "\n")
-        source(tmp_full_path, testEnv)
-      }, error = function(e) {
-        
-        cat("Unable to run: ",  path, "\n")
-        cat("Error message: \n")
-        message(e)
-        cat("\n")
-      }, warning = function(w){
-        cat("Produced a warning: ", path, "\n")
-        message(w)
-        cat("\n")
-      })
+    rogueScript <- function(suppress_warnings, verbose, path, tmp_full_path){
+      rogueEnv <- new.env()
+      if(suppress_warnings){
+        tryCatch({
+          
+          if(verbose)
+            cat("grading: ", path, "\n")
+          
+          suppressWarnings(source(tmp_full_path, rogueEnv))
+        }, error = function(e) {
+          
+          cat("Unable to run: ",  path, "\n")
+          cat("Error message: \n")
+          message(e)
+          cat("\n")
+        })
+      } else { #not suppressing warnings
+        tryCatch({
+          
+          if(verbose)
+            cat("grading: ", path, "\n")
+          
+          source(tmp_full_path, rogueEnv)
+        }, error = function(e) {
+          
+          cat("Unable to run: ",  path, "\n")
+          cat("Error message: \n")
+          message(e)
+          cat("\n")
+        }, warning = function(w){
+          cat("Produced a warning: ", path, "\n")
+          message(w)
+          cat("\n")
+        })
+      }
+      
+      # return the enclosing environment
+      rogueEnv
     }
+    scriptResults <- callr::r(rogueScript, 
+                              args = list(suppress_warnings, 
+                                          verbose, 
+                                          path, 
+                                          tmp_full_path))
+
     # test the student's submissions
     lr <- testthat::ListReporter$new()
     out <- testthat::test_file(your_test_file, 
                                reporter = lr,
-                               env = testEnv)
+                               env = scriptResults)
     
     # parse the output
     score_data[student_num,1] <- tmp_full_path
@@ -152,7 +169,9 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
       
       # true or false if question was correct
       assertionResults <- lr$results$as_list()[[q]]$results
-      success <- all(sapply(assertionResults, methods::is, "expectation_success")) 
+      success <- all(sapply(assertionResults, 
+                            methods::is, 
+                            "expectation_success")) 
       
       # TODO incorporate point values
       if(success){
@@ -161,13 +180,6 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
         score_data[student_num, q+1] <- 0
       }
     }
-    
-    # clear out all of the student's data from global environment
-    rm(list = setdiff(ls(testEnv), 
-                      c("path", "paths", "submission_dir", 
-                        "student_num", "number_questions", 
-                        "number_students", "score_data",
-                        "your_test_file", "path")), envir = testEnv)
     
     # increment 
     student_num <- student_num + 1
@@ -202,35 +214,39 @@ calcGradesForGradescope <- function(submission_file,
   if(missing(test_file)) 
     stop("must have a test file")
   
-  # TODO: add this to the other function
-  number_tests <- length(testthat::test_file(test_file, reporter = "minimal"))
+  number_tests <- length(testthat::test_file(test_file, 
+                                             reporter = "minimal"))
   if(number_tests == 0)
     stop("you need at least one graded question")
   
-  # run student's submission in a separate environment
-  testEnv <- new.env(parent = globalenv())
-  
-  # source each assignment
-  if(suppress_warnings){
-    suppressWarnings(
-      tryCatch(source(submission_file, testEnv),  
+  # run student's submission in a separate process
+  # https://stackoverflow.com/a/63746414/1267833
+  rogueScript <- function(){
+    rogueEnv <- new.env()
+    if(suppress_warnings){
+      suppressWarnings(
+        tryCatch(source(submission_file, rogueEnv),  
+                 error = function(c) c, 
+                 warning = function(c) c,
+                 message = function(c) c)
+      )
+    }else{
+      tryCatch(source(submission_file, rogueEnv),  
                error = function(c) c, 
                warning = function(c) c,
                message = function(c) c)
-    )
-  }else{
-    tryCatch(source(submission_file, testEnv),  
-             error = function(c) c, 
-             warning = function(c) c,
-             message = function(c) c)
+    }
+    rogueEnv
   }
+  scriptResults <- callr::r(rogueScript, 
+                            args = list(suppress_warnings))
   
   # test the student's submissions
   # for the time being, each test is worth one point
   lr <- testthat::ListReporter$new()
   out <- testthat::test_file(test_file, 
                              reporter = lr, 
-                             env = testEnv)
+                             env = scriptResults)
   tests <- list()
   tests[["tests"]] <- list()
   raw_results <- lr$results$as_list()
