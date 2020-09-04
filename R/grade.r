@@ -221,7 +221,7 @@ calcGradesForGradescope <- function(submission_file,
   
   # run student's submission in a separate process
   # https://stackoverflow.com/a/63746414/1267833
-  rogueScript <- function(){
+  rogueScript <- function(suppress_warnings){
     rogueEnv <- new.env()
     if(suppress_warnings){
       suppressWarnings(
