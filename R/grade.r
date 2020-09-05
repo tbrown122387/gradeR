@@ -216,25 +216,25 @@ calcGradesForGradescope <- function(submission_file,
   # run student's submission in a separate process
   # https://stackoverflow.com/a/63746414/1267833
   if( suppress_warnings ) {
-    rogueScript <- function(){
+    rogueScript <- function(source_file_path){
       rogueEnv <- new.env()  
-      tryCatch(suppressWarnings(source(submission_file, rogueEnv)),  
+      tryCatch(suppressWarnings(source(source_file_path, rogueEnv)),  
                error = function(c) c, 
                message = function(c) c)
       rogueEnv
     }
   } else { # not suppressing warnings
-    rogueScript <- function(){
+    rogueScript <- function(source_file_path){
       rogueEnv <- new.env()  
-      tryCatch(source(submission_file, rogueEnv),  
+      tryCatch(source(source_file_path, rogueEnv),  
                error = function(c) c,
                warning = function(w) w,
                message = function(c) c)
       rogueEnv
     }
   }
-  scriptResults <- callr::r(rogueScript)
-  
+  scriptResults <- callr::r(rogueScript, args = list(submission_file))
+
   # test the student's submissions
   # for the time being, each test is worth one point
   lr <- testthat::ListReporter$new()
