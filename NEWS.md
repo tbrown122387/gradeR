@@ -1,3 +1,9 @@
+# gradeR 1.0.9
+
+## Extra things
+
+Student submissions are now run in a separate `R` session. This will ensure that student submissions are run with the same search path that they are using on their local machines. 
+
 # gradeR 1.0.8
 
 ## Extra things
