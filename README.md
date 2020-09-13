@@ -8,8 +8,9 @@
 <!-- badges: end -->
 
 The goal of `gradeR` is to help grade bunches of `R` script assignment
-submissions. This package has one function called `calcGrades()`, and
-much of the testing functionality is taken from the `testthat` package.
+submissions. This package has two primary functions called
+`calcGrades()` and `calcGradesForGradescope`, and much of the testing
+functionality is taken from the `testthat` package.
 
 ## Installation
 
@@ -20,7 +21,7 @@ You can install the released version of `gradeR` from
 install.packages("gradeR")
 ```
 
-You can install the development version of `gradeR` from with:
+You can install the development version of `gradeR` with:
 
 ``` r
 # install.packages("devtools")
@@ -32,7 +33,7 @@ devtools::install_github("tbrown122387/gradeR")
 This is a basic overview which shows you how to grade a bunch of
 assignment submissions. Make sure to change the paths to ones that
 actually exist on your machine. For more details on this example, see
-the [vignette](https://cran.r-project.org/package=gradeR/vignettes/gradeR.html).
+the vignette.
 
 ``` r
 # load in the package
