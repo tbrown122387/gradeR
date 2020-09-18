@@ -219,17 +219,17 @@ calcGradesForGradescope <- function(submission_file,
     rogueScript <- function(source_file_path){
       rogueEnv <- new.env()  
       tryCatch(suppressWarnings(source(source_file_path, rogueEnv)),  
-               error = function(c) c, 
-               message = function(c) c)
+               error = function(c) print(paste0("error: ", c)), 
+               message = function(c) print(paste0("warning: ", c)) )
       rogueEnv
     }
   } else { # not suppressing warnings
     rogueScript <- function(source_file_path){
       rogueEnv <- new.env()  
       tryCatch(source(source_file_path, rogueEnv),  
-               error = function(c) c,
-               warning = function(w) w,
-               message = function(c) c)
+               error = function(c) print(paste0("error: ", c)),
+               warning = function(w) print(paste0("warning:", w)),
+               message = function(c) print(paste0("message: ", message)))
       rogueEnv
     }
   }
