@@ -113,44 +113,42 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
     # https://stackoverflow.com/questions/63744905/attaching-packages-to-a-temporary-search-path-in-r/63746414#63746414
     tmp_full_path <- paste(submission_dir, path, sep = "")
     if(verbose) cat("grading: ", path, "\n")
-    
-    if( suppress_warnings ){
-      rogueScript <- function(tmp_full_path){
-        rogueEnv <- new.env()
-
-        tryCatch(
-          suppressWarnings(source(tmp_full_path, rogueEnv)), 
-          error = function(e) {
-            cat("Unable to run: ",  tmp_full_path, "\n")
-            cat("Error message: \n")
-            message(e)
-            cat("\n")
-          })
-        
-          rogueEnv
-        }
-    }else{ # not suppressing warnings
-      rogueScript <- function(tmp_full_path){
-        rogueEnv <- new.env()
-        
-        tryCatch(
-          source(tmp_full_path, rogueEnv), 
-          error = function(e) {
-            cat("Unable to run: ",  tmp_full_path, "\n")
-            cat("Error message: \n")
-            message(e)
-            cat("\n")},
-          warning = function(w){
-            cat("Produced a warning: ", tmp_full_path, "\n")
-            message(w)
-            cat("\n")
-          })
-
-        rogueEnv
-      }
+    # run student's submission in a separate process
+    # https://stackoverflow.com/a/63746414/1267833
+    rogueScript <- function(source_file_path){
+      rogueEnv <- new.env()  
+      source(source_file_path, rogueEnv)
+      rogueEnv
     }
-    scriptResults <- callr::r(rogueScript, args = list(tmp_full_path))
-
+    if( suppress_warnings ){
+      tryCatch(
+        suppressWarnings(scriptResults <- callr::r(rogueScript, 
+                                                   args = list(tmp_full_path), 
+                                                   show = TRUE)),
+        error = function(e){
+          print(paste0("error: ", e$parent$call))
+          print(e$parent$trace)
+        },
+        message = function(m){
+          print(paste0("message: ", m))
+        })
+    }else{ # not suppressing warnings
+      tryCatch(
+        scriptResults <- callr::r(rogueScript, 
+                                  args = list(tmp_full_path), 
+                                  show = TRUE),
+        error = function(e){
+          print(paste0("error: ", e$parent$call))
+          print(e$parent$trace)
+        },
+        message = function(m){
+          print(paste0("message: ", m))
+        },
+        warning = function(w){
+          print(paste0("warning: ", w))
+        })
+    }
+    
     # test the student's submissions
     lr <- testthat::ListReporter$new()
     out <- testthat::test_file(your_test_file, 
@@ -215,25 +213,39 @@ calcGradesForGradescope <- function(submission_file,
   
   # run student's submission in a separate process
   # https://stackoverflow.com/a/63746414/1267833
-  if( suppress_warnings ) {
-    rogueScript <- function(source_file_path){
-      rogueEnv <- new.env()  
-      tryCatch(suppressWarnings(source(source_file_path, rogueEnv)),  
-               error = function(c) print(paste0("error: ", c)), 
-               message = function(c) print(paste0("warning: ", c)) )
-      rogueEnv
-    }
-  } else { # not suppressing warnings
-    rogueScript <- function(source_file_path){
-      rogueEnv <- new.env()  
-      tryCatch(source(source_file_path, rogueEnv),  
-               error = function(c) print(paste0("error: ", c)),
-               warning = function(w) print(paste0("warning:", w)),
-               message = function(c) print(paste0("message: ", message)))
-      rogueEnv
-    }
+  rogueScript <- function(source_file_path){
+    rogueEnv <- new.env()  
+    source(source_file_path, rogueEnv)
+    rogueEnv
   }
-  scriptResults <- callr::r(rogueScript, args = list(submission_file))
+  if( suppress_warnings ){
+    tryCatch(
+      suppressWarnings(scriptResults <- callr::r(rogueScript, 
+                                                 args = list(submission_file), 
+                                                 show = TRUE)),
+      error = function(e){
+        print(paste0("error: ", e$parent$call))
+        print(e$parent$trace)
+      },
+      message = function(m){
+        print(paste0("message: ", m))
+      })
+  }else{ # not suppressing warnings
+    tryCatch(
+      scriptResults <- callr::r(rogueScript, args = list(submission_file), show = TRUE),
+      error = function(e){
+        print(paste0("error: ", e$parent$call))
+        print(e$parent$trace)
+      },
+      message = function(m){
+        print(paste0("message: ", m))
+      },
+      warning = function(w){
+        print(paste0("warning: ", w))
+      })
+  }
+
+  
 
   # test the student's submissions
   # for the time being, each test is worth one point
