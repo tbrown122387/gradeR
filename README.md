@@ -69,3 +69,8 @@ It might be beneficial to recommend that your students:
     and then read in files using only their name). If they forget to do
     this, then you will need to change all of the global paths to local
     paths on their machine.
+
+## Contributing
+
+Please click [here](CONTRIBUTING.md) for more information on how you can
+contribute to this project\!
