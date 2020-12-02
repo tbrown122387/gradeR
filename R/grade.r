@@ -120,6 +120,9 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
       source(source_file_path, rogueEnv)
       rogueEnv
     }
+    # remove previous scriptResults in case an error is triggered and it's never re-created
+    if( exists("scriptResults") ) rm(scriptResults)
+    
     if( suppress_warnings ){
       tryCatch(
         suppressWarnings(scriptResults <- callr::r(rogueScript, 
@@ -150,27 +153,34 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
     }
     
     # test the student's submissions
-    lr <- testthat::ListReporter$new()
-    out <- testthat::test_file(your_test_file, 
-                               reporter = lr,
-                               env = scriptResults)
-    
-    # parse the output
-    score_data[student_num,1] <- tmp_full_path
-    for(q in (1:number_questions)){
+    # note that scriptResults might not exist if there was an error in the tryCatch block
+    if( exists("scriptResults") ){
+      lr <- testthat::ListReporter$new()
+      out <- testthat::test_file(your_test_file, 
+                                 reporter = lr,
+                                 env = scriptResults)
       
-      # true or false if question was correct
-      assertionResults <- lr$results$as_list()[[q]]$results
-      success <- all(sapply(assertionResults, 
-                            methods::is, 
-                            "expectation_success")) 
-      
-      # TODO incorporate point values
-      if(success){
-        score_data[student_num, q+1] <- 1
-      }else{
-        score_data[student_num, q+1] <- 0
+      # parse the output
+      score_data[student_num,1] <- tmp_full_path
+      for(q in (1:number_questions)){
+        
+        # true or false if question was correct
+        assertionResults <- lr$results$as_list()[[q]]$results
+        success <- all(sapply(assertionResults, 
+                              methods::is, 
+                              "expectation_success")) 
+        
+        # TODO incorporate point values
+        if(success){
+          score_data[student_num, q+1] <- 1
+        }else{
+          score_data[student_num, q+1] <- 0
+        }
       }
+      
+    }else{
+      print("assigning all zeros for this student due to bug in submissions")
+      score_data[student_num,1] <- tmp_full_path
     }
     
     # increment 
