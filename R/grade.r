@@ -95,8 +95,9 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
                       pattern = "\\.r$", 
                       ignore.case = T)
   
-  number_questions <- length(testthat::test_file(your_test_file, 
-                                                 reporter = "minimal"))
+  trial_test <- testthat::test_file(your_test_file, reporter = "minimal")
+  number_questions <- length(trial_test)
+
   if(number_questions == 0)
     stop("You need at least one graded question")
   
@@ -188,8 +189,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
   }
   
   # make the column names prettier before returning everything
-  colnames(score_data)[-1] <-  paste("q", as.character(1:number_questions), sep = "")
-  
+  colnames(score_data)[-1] <- sapply(trial_test, `[[`, "test")
   return(score_data)
 }
 
