@@ -128,7 +128,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
       tryCatch(
         suppressWarnings(scriptResults <- callr::r(rogueScript, 
                                                    args = list(tmp_full_path), 
-                                                   show = TRUE)),
+                                                   show = TRUE, package = TRUE)),
         error = function(e){
           print(paste0("error: ", e$parent$call))
           print(e$parent$trace)
@@ -140,7 +140,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
       tryCatch(
         scriptResults <- callr::r(rogueScript, 
                                   args = list(tmp_full_path), 
-                                  show = TRUE),
+                                  show = TRUE, package = TRUE),
         error = function(e){
           print(paste0("error: ", e$parent$call))
           print(e$parent$trace)
@@ -232,7 +232,7 @@ calcGradesForGradescope <- function(submission_file,
     tryCatch(
       suppressWarnings(scriptResults <- callr::r(rogueScript, 
                                                  args = list(submission_file), 
-                                                 show = TRUE)),
+                                                 show = TRUE, package = TRUE)),
       error = function(e){
         print(paste0("error: ", e$parent$call))
         print(e$parent$trace)
@@ -242,7 +242,7 @@ calcGradesForGradescope <- function(submission_file,
       })
   }else{ # not suppressing warnings
     tryCatch(
-      scriptResults <- callr::r(rogueScript, args = list(submission_file), show = TRUE),
+      scriptResults <- callr::r(rogueScript, args = list(submission_file), show = TRUE, package = TRUE),
       error = function(e){
         print(paste0("error: ", e$parent$call))
         print(e$parent$trace)
