@@ -1,3 +1,9 @@
+# gradeR 1.0.10
+
+## Bug fixes
+
+`library()`ing packages didn't work, and that's now fixed. This was because callr::r() needed package=TRUE.
+
 # gradeR 1.0.9
 
 ## Extra things
