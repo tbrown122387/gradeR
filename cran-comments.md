@@ -5,8 +5,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 notes
 
 * This is an update.
 
-* removed CONTRIBUTING.md from .Rbuildignore so there's no dead link to CONTRIBUTING.md on README.md

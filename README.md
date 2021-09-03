@@ -4,7 +4,6 @@
 # gradeR
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of `gradeR` is to help grade bunches of `R` script assignment
@@ -58,19 +57,19 @@ file you must create on your own. For more information on how to write
 
 It might be beneficial to recommend that your students:
 
-  - clear out their workspace and `source` their `.R` submissions before
+-   clear out their workspace and `source` their `.R` submissions before
     submitting them. This makes sure everything runs as expected (at
     least on their machine).
-  - to not rename files that are read in as data, or change any raw data
+-   to not rename files that are read in as data, or change any raw data
     files on *their* hard drives. If they forget to abide by this rule,
     you will have to edit their submission and rename file names in
     their script.
-  - to not use global file paths (have them interactively use `setwd()`,
+-   to not use global file paths (have them interactively use `setwd()`,
     and then read in files using only their name). If they forget to do
     this, then you will need to change all of the global paths to local
     paths on their machine.
 
 ## Contributing
 
-Please click [here](CONTRIBUTING.md) for more information on how you can
-contribute to this project\!
+Please see `CONTRIBUTING.md` for more information on how you can
+contribute to this project!

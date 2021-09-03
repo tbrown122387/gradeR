@@ -64,4 +64,4 @@ It might be beneficial to recommend that your students:
 
 ## Contributing
 
-Please click [here](CONTRIBUTING.md) for more information on how you can contribute to this project!
+Please see `CONTRIBUTING.md` for more information on how you can contribute to this project!
