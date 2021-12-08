@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: 'gradeR: helps grade R script assignment submissions'
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Taylor
+    family-names: Brown
+    email: tbrown122387@gmail.com
+    affiliation: University of Virginia Department of Statistics
+    orcid: 'https://orcid.org/0000-0003-4972-6251'
+version: 1.0.11
+doi: 10.5281/zenodo.5768314 
+date-released: 2021-12-08
+url: "https://github.com/tbrown122387/gradeR"
