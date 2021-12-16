@@ -307,29 +307,29 @@ calcGradesForGradescope <- function(submission_file,
 #' @export
 #' @examples
 #' \donttest{
-exampleDF <- data.frame(student = c('a','b','c'),
-                        test1 = c(50,50,NA),
-                        test1LateAdjustment = c(.99,1,1),
-                        hw1=c(45,44,43),
-                        hw1LateAdjustment = c(1,1,1),
-                        hw2=c(50,49,48),
-                        hw2LateAdjustment = c(1,1,1))
-
-testCols <- data.frame(gradeNames = 'test1', 
-                       lateNames = 'test1LateAdjustment')
-testCategory <- list(colNames=testCols,
-                     maxScores=50,
-                     catWeight=.6)
-
-hwCols <- data.frame(gradeNames = c('hw1','hw2'), 
-                     lateNames = c('hw1LateAdjustment','hw2LateAdjustment'))
-homeworkCategory <- list(colNames=hwCols,
-                         maxScores=c(50,50),
-                         catWeight=.4)
-cats <- list(tests=testCategory, homeworks=homeworkCategory)
-myDrops = list(numToDrop=1, cats='homeworks')
-calculateOverallAverage(exampleDF, cats, 'student', myDrops)
-calculateOverallAverage(exampleDF, cats, 'student', myDrops, traceCalcsForStudent = 'a')
+#' exampleDF <- data.frame(student = c('a','b','c'),
+#'                         test1 = c(50,50,NA),
+#'                         test1LateAdjustment = c(.99,1,1),
+#'                         hw1=c(45,44,43),
+#'                         hw1LateAdjustment = c(1,1,1),
+#'                         hw2=c(50,49,48),
+#'                         hw2LateAdjustment = c(1,1,1))
+#' 
+#' testCols <- data.frame(gradeNames = 'test1', 
+#'                        lateNames = 'test1LateAdjustment')
+#' testCategory <- list(colNames=testCols,
+#'                      maxScores=50,
+#'                      catWeight=.6)
+#' 
+#' hwCols <- data.frame(gradeNames = c('hw1','hw2'), 
+#'                      lateNames = c('hw1LateAdjustment','hw2LateAdjustment'))
+#' homeworkCategory <- list(colNames=hwCols,
+#'                          maxScores=c(50,50),
+#'                          catWeight=.4)
+#' cats <- list(tests=testCategory, homeworks=homeworkCategory)
+#' myDrops = list(numToDrop=1, cats='homeworks')
+#' calculateOverallAverage(exampleDF, cats, 'student', myDrops)
+#' calculateOverallAverage(exampleDF, cats, 'student', myDrops, traceCalcsForStudent = 'a')
 #' }
 calculateOverallAverage <- function(table, categories, studentNameCol, 
                                     drop = NULL, 
