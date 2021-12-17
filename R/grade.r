@@ -316,16 +316,16 @@ calcGradesForGradescope <- function(submission_file,
 #'                         hw2LateAdjustment = c(1,1,1))
 #' 
 #' testCols <- data.frame(gradeNames = 'test1', 
-#'                        lateNames = 'test1LateAdjustment')
+#'                        lateNames = 'test1LateAdjustment', 
+#'                        maxScores = 50)
 #' testCategory <- list(colNames=testCols,
-#'                      maxScores=50,
 #'                      catWeight=.6)
-#' 
 #' hwCols <- data.frame(gradeNames = c('hw1','hw2'), 
-#'                      lateNames = c('hw1LateAdjustment','hw2LateAdjustment'))
+#'                      lateNames = c('hw1LateAdjustment','hw2LateAdjustment'),
+#'                      maxScores = c(50,50))
 #' homeworkCategory <- list(colNames=hwCols,
-#'                          maxScores=c(50,50),
 #'                          catWeight=.4)
+#' 
 #' cats <- list(tests=testCategory, homeworks=homeworkCategory)
 #' myDrops = list(numToDrop=1, cats='homeworks')
 #' calculateOverallAverage(exampleDF, cats, 'student', myDrops)
@@ -334,6 +334,14 @@ calcGradesForGradescope <- function(submission_file,
 calculateOverallAverage <- function(table, categories, studentNameCol, 
                                     drop = NULL, 
                                     traceCalcsForStudent = NULL){
+  
+  ######################
+  # reusable variables #
+  ######################
+  numStudents <- nrow(table)
+  catNames <- names(categories)
+  allAssignmentNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'gradeNames'))
+  allLateNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'lateNames'))
   
   ###################
   # performs checks #
@@ -345,9 +353,9 @@ calculateOverallAverage <- function(table, categories, studentNameCol,
   # TODO: check the number of drops is strictly less than the number of assignments to drop from
   # check assignment names in categories all exist in data table
   assignmentNamesInCats <- unlist(sapply(categories, '[[', 'colNames'))
-  stopifnot(all(assignmentNamesInCats %in% colnames(table)))
-  # check no assignment is double-listed in two categories
-  stopifnot(length(assignmentNamesInCats) == length(unique(assignmentNamesInCats)))
+  stopifnot(all(allAssignmentNames %in% colnames(table)))
+  stopifnot(all(allLateNames %in% colnames(table)))
+  # TODO check no assignment is double-listed in two categorie
   #TODO check dimension of maxScores in categories (and everything else)
   # TODO check they're vector too
   # lateMultColNames
@@ -365,15 +373,6 @@ calculateOverallAverage <- function(table, categories, studentNameCol,
   # TODO make this only work on grade columns
   table[is.na(table)] <- 0
   
-  ######################
-  # reusable variables #
-  ######################
-  numStudents <- nrow(table)
-  catNames <- names(categories)
-  allAssignmentNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'gradeNames'))
-  allLateNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'lateNames'))
-  #gradesOnlyDF <- subset(table, select = allAssignmentNames)
-  
   ##############################
   # convert scores to percents #
   # also deduct lateness       #
@@ -384,7 +383,7 @@ calculateOverallAverage <- function(table, categories, studentNameCol,
     for(i in seq_along(gradeColumnNames) ){
       
       gradeColumnName <- gradeColumnNames[i]
-      maxScore <- as.numeric(myCat$maxScores[i])
+      maxScore <- myCat$colNames$maxScores[i]
       stopifnot(length(maxScore) == 1)
       
       haveLatenessCol <- !is.null(myCat$colNames$lateNames[i])
