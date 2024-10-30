@@ -87,6 +87,7 @@ test_that("1.1a",{
 
 For a complete list of all available `expect_*` functions, see [`testthat`'s documentation](https://testthat.r-lib.org/reference/index.html).
 
+Note that the student submissions are run in a new, clean environment.  The tests are run in a different environment than the student submissions.  Therefore, any libraries included in the student submissions must also be included in the test environment.
 
 ## A Fully-Worked Example
 
