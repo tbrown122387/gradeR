@@ -4,6 +4,24 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+change font size
+```{=html}
+<style type="text/css">
+
+body, td {
+   font-size: 20px;
+}
+code.r{
+  font-size: 15px;
+}
+pre {
+  font-size: 12px
+}
+</style>
+```
+
+
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
