@@ -408,15 +408,22 @@ calculateOverallAverage <- function(table, categories, studentNameCol,
   # fill NA grades s with zeros #
   ###############################
   # TODO make this only work on grade columns
-  #table[is.na(table)] <- 0
+  #table[is.na(table)] <- 0 # original code
   
   # Only replace NAs in grade and late columns
   all_grade_cols <- c(allAssignmentNames, allLateNames)
-  for (col in all_grade_cols) {
-   if(col %in% colnames(table)) { # Check if column exists before trying to modify
-    table[[col]][is.na(table[[col]])] <- 0
-   }
-  }
+  cols_to_modify <- intersect(all_grade_cols, colnames(table))
+  table[, cols_to_modify] <- lapply(table[, cols_to_modify], function(x) {
+  x[is.na(x)] <- 0
+  return(x)
+  }) # Apply the NA replacement function to just those columns
+
+  # An alternative approach:
+  #for (col in all_grade_cols) {
+  # if(col %in% colnames(table)) { # Check if column exists before trying to modify
+  #  table[[col]][is.na(table[[col]])] <- 0
+  # }
+  # }
   
   ##############################
   # convert scores to percents #
