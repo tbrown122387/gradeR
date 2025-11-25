@@ -351,6 +351,21 @@ calculateOverallAverage <- function(table, categories, studentNameCol,
   # check dropped categories all exist 
   if(!is.null(drop)) stopifnot(all(drop$cats %in% names(categories)))
   # TODO: check the number of drops is strictly less than the number of assignments to drop from
+  # The code below adds a check inside the if(!is.null(drop)) block. 
+  # It loops through each category specified in drop$cats, 
+  # finds the number of assignments in that category, 
+  # and throws an error using stop() if the number to drop is 
+  # greater than or equal to the number of assignments available to be dropped.
+  if(!is.null(drop)) {
+   for (cat_name in drop$cats) {
+    num_assignments <- length(categories[[cat_name]]$colNames$gradeNames)
+    if (drop$numToDrop >= num_assignments) {
+     stop(paste0("Cannot drop ", drop$numToDrop, " assignments from category '", 
+                 cat_name, "' which only has ", num_assignments, " assignments."))
+    }
+   }
+  }
+  
   # check assignment names in categories all exist in data table
   assignmentNamesInCats <- unlist(sapply(categories, '[[', 'colNames'))
   stopifnot(all(allAssignmentNames %in% colnames(table)))
