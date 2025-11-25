@@ -370,7 +370,15 @@ calculateOverallAverage <- function(table, categories, studentNameCol,
   assignmentNamesInCats <- unlist(sapply(categories, '[[', 'colNames'))
   stopifnot(all(allAssignmentNames %in% colnames(table)))
   stopifnot(all(allLateNames %in% colnames(table)))
-  # TODO check no assignment is double-listed in two categorie
+  # TODO check no assignment is double-listed in two categories
+  if (any(duplicated(allAssignmentNames))) {
+   stop("The following assignment names are listed in multiple categories: ",
+        paste(allAssignmentNames[duplicated(allAssignmentNames)], collapse = ", "))
+  }
+  if (any(duplicated(allLateNames))) {
+   stop("The following late adjustment names are listed in multiple categories: ",
+        paste(allLateNames[duplicated(allLateNames)], collapse = ", "))
+  }
   #TODO check dimension of maxScores in categories (and everything else)
   # TODO check they're vector too
   # lateMultColNames
