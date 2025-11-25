@@ -382,7 +382,21 @@ calculateOverallAverage <- function(table, categories, studentNameCol,
   #TODO check dimension of maxScores in categories (and everything else)
   # TODO check they're vector too
   # lateMultColNames
-  
+  for (cat_name in names(categories)) {
+   col_names_df <- categories[[cat_name]]$colNames
+   num_grades <- length(col_names_df$gradeNames)
+   
+   if (length(col_names_df$lateNames) != num_grades) {
+    stop(paste0("In category '", cat_name, 
+                "': length of 'lateNames' (", length(col_names_df$lateNames),
+                ") does not match length of 'gradeNames' (", num_grades, ")."))
+   }
+   if (length(col_names_df$maxScores) != num_grades) {
+    stop(paste0("In category '", cat_name, 
+                "': length of 'maxScores' (", length(col_names_df$maxScores),
+                ") does not match length of 'gradeNames' (", num_grades, ")."))
+   }
+  }
   
   # check names of drop
   # document return value?
