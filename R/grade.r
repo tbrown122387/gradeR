@@ -10,6 +10,9 @@
 #' submissions <- "extdata/assignment1_submissions/"
 #' findBadEncodingFiles(submissions) # perhaps ask these students to resubmit
 #' }
+
+print("I found success!")
+
 findBadEncodingFiles <- function(submission_dir){
   scripts_to_grade <- list.files(path = submission_dir, 
                                  recursive = T, 
