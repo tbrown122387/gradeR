@@ -72,4 +72,5 @@ It might be beneficial to recommend that your students:
 ## Contributing
 
 Please see `CONTRIBUTING.md` for more information on how you can
-contribute to this project!
+contribute to this project! Just try!
+
