@@ -1,3 +1,4 @@
+# Make a change to this file
 #' This function finds unreadable files.
 #'
 #'  A function that finds student submissions with poorly encoded characters
