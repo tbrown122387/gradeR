@@ -10,6 +10,7 @@ The goal of `gradeR` is to help grade bunches of `R` script assignment
 submissions. This package has two primary functions called
 `calcGrades()` and `calcGradesForGradescope`, and much of the testing
 functionality is taken from the `testthat` package.
+# This is a test change for Q1
 
 ## Installation
 
