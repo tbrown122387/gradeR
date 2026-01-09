@@ -284,10 +284,29 @@ calcGradesForGradescope <- function(submission_file,
     assertionResults <- raw_results[[i]]$results
     success <- all(sapply(assertionResults, methods::is, "expectation_success"))
     test_score <- ifelse(success, 1, 0)
+    
+    output_messages <- c()
+    if(!success){
+      for(assertion in assertionResults){
+        if(methods::is(assertion, "expectation_failure")){
+          output_messages <- c(output_messages, assertion$message)
+        }
+      }
+    }
+    
+    # Build output string
+    output_text <- if(length(output_messages) > 0){
+      paste(output_messages, collapse = "\n\n")
+    } else if(success){
+      "All tests passed!"
+    } else {
+      "Test failed"
+    }
     tests[["tests"]][[i]] <- list(name = test_name,
                                   score = test_score,
                                   max_score = test_max_score,
-                                  visibility = test_visibility)
+                                  visibility = test_visibility,
+                                  output = output_text)
   }
   
   # now write out all the stuff to a json file

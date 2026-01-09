@@ -2,5 +2,6 @@
 
 export(calcGrades)
 export(calcGradesForGradescope)
+export(calculateOverallAverage)
 export(findBadEncodingFiles)
 export(findGlobalPaths)

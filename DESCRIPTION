@@ -6,7 +6,7 @@ Description: After being given the location of your students' submissions and a 
 Depends: R (>= 3.4)
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
 Imports:
     testthat,
     methods,
