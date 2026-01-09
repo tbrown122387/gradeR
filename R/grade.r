@@ -222,6 +222,21 @@ calcGradesForGradescope <- function(submission_file,
   if(number_tests == 0)
     stop("you need at least one graded question")
   
+  # Check if submission is a Quarto document
+  file_ext <- tools::file_ext(submission_file)
+  is_quarto <- tolower(file_ext) == "qmd"
+  
+  # If Quarto, extract R code to temporary file
+  if(is_quarto){
+    temp_r_file <- tempfile(fileext = ".R")
+    tryCatch({
+      knitr::purl(submission_file, output = temp_r_file, quiet = TRUE)
+      submission_file <- temp_r_file  # Use extracted R code for evaluation
+    }, error = function(e){
+      stop("Failed to extract R code from Quarto document: ", e$message)
+    })
+  }
+  
   # run student's submission in a separate process
   # https://stackoverflow.com/a/63746414/1267833
   rogueScript <- function(source_file_path){
