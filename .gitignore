@@ -4,4 +4,5 @@ doc
 Meta
 .Rhistory
 .RData
-
+scratch/*
+results.json
