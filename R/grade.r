@@ -222,18 +222,18 @@ calcGradesForGradescope <- function(submission_file,
   if(number_tests == 0)
     stop("you need at least one graded question")
   
-  # Check if submission is a Quarto document
+  # Check if submission is a Qmd/Rmd document
   file_ext <- tools::file_ext(submission_file)
-  is_quarto <- tolower(file_ext) == "qmd"
+  is_rmd_qmd <- tolower(file_ext) %in% c("qmd","rmd")
   
   # If Quarto, extract R code to temporary file
-  if(is_quarto){
+  if(is_rmd_qmd){
     temp_r_file <- tempfile(fileext = ".R")
     tryCatch({
       knitr::purl(submission_file, output = temp_r_file, quiet = TRUE)
       submission_file <- temp_r_file  # Use extracted R code for evaluation
     }, error = function(e){
-      stop("Failed to extract R code from Quarto document: ", e$message)
+      stop("Failed to extract R code from Rmd/Qmd document: ", e$message)
     })
   }
   
@@ -313,7 +313,7 @@ calcGradesForGradescope <- function(submission_file,
     output_text <- if(length(output_messages) > 0){
       paste(output_messages, collapse = "\n\n")
     } else if(success){
-      "All tests passed!"
+      "Test passed! 👍"
     } else {
       "Test failed"
     }
