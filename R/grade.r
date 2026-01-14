@@ -282,8 +282,10 @@ calcGradesForGradescope <- function(submission_file,
   tests <- list()
   tests[["tests"]] <- list()
   raw_results <- lr$results$as_list()
+  
   for(i in 1:number_tests){
     test_name <- raw_results[[i]]$test
+    
     if(  grepl("\\(visible\\)", test_name) ){
         test_visibility <- "visible"
     }else if( grepl("\\(hidden\\)", test_name) ){
@@ -295,28 +297,52 @@ calcGradesForGradescope <- function(submission_file,
     }else{
         test_visibility <- "after_due_date"
     }
+    
     test_max_score <- 1 # TODO generalize
     assertionResults <- raw_results[[i]]$results
     success <- all(sapply(assertionResults, methods::is, "expectation_success"))
     test_score <- ifelse(success, 1, 0)
     
-    output_messages <- c()
-    if(!success){
-      for(assertion in assertionResults){
-        if(methods::is(assertion, "expectation_failure")){
-          output_messages <- c(output_messages, assertion$message)
+    criterion_messages <- c()
+    for(j in seq_along(assertionResults)){
+      assertion <- assertionResults[[j]]
+      
+      # Extract custom label or create default message
+      # The label is embedded in the srcref attribute
+      custom_msg <- if(!is.null(assertion$srcref)){
+        # Try to extract label from the source code
+        src_text <- paste(as.character(assertion$srcref), collapse = " ")
+        
+        # Look for label parameter in the expectation
+        if(grepl('label\\s*=\\s*["\']', src_text)){
+          label_match <- regmatches(src_text, regexpr('label\\s*=\\s*["\']([^"\']+)["\']', src_text, perl = TRUE))
+          if(length(label_match) > 0){
+            sub('.*label\\s*=\\s*["\']([^"\']+)["\'].*', '\\1', label_match)
+          } else {
+            paste0("Criterion ", j)
+          }
+        } else {
+          paste0("Criterion ", j)
         }
+      } else {
+        paste0("Criterion ", j)
       }
+      
+      # Determine pass/fail status
+      if(methods::is(assertion, "expectation_success")){
+        criterion_messages <- c(criterion_messages, paste0("+1 (test passed): ", custom_msg))
+      } else if(methods::is(assertion, "expectation_failure")){
+        criterion_messages <- c(criterion_messages, paste0("+0 (test failed): ", custom_msg))
+        }
     }
     
     # Build output string
-    output_text <- if(length(output_messages) > 0){
-      paste(output_messages, collapse = "\n\n")
-    } else if(success){
-      "Test passed! 👍"
+    if(length(criterion_messages) > 0){
+      output_text <- paste(criterion_messages, collapse = "\n")
     } else {
-      "Test failed"
+      output_text <- ifelse(success, "Test passed! 👍", "Test failed")
     }
+    
     tests[["tests"]][[i]] <- list(name = test_name,
                                   score = test_score,
                                   max_score = test_max_score,
