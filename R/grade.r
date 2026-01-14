@@ -332,8 +332,8 @@ calcGradesForGradescope <- function(submission_file,
       if(methods::is(assertion, "expectation_success")){
         criterion_messages <- c(criterion_messages, paste0("+1 (test passed): ", custom_msg))
       } else if(methods::is(assertion, "expectation_failure")){
-        criterion_messages <- c(criterion_messages, paste0("+0 (test failed): ", custom_msg))
-        }
+        criterion_messages <- c(criterion_messages, paste0('<span style="color: red;"><b>+0 (test failed): ', custom_msg, '</b></span>'))
+      }
     }
     
     # Build output string
