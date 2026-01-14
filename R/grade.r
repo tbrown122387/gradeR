@@ -286,16 +286,22 @@ calcGradesForGradescope <- function(submission_file,
   for(i in 1:number_tests){
     test_name <- raw_results[[i]]$test
     
-    if(  grepl("\\(visible\\)", test_name) ){
-        test_visibility <- "visible"
-    }else if( grepl("\\(hidden\\)", test_name) ){
-        test_visibility <- "hidden"
-    }else if(  grepl("\\(after_due_date\\)", test_name) ){
-        test_visibility <- "after_due_date"
-    }else if( grepl("\\(after_published\\)", test_name) ){
-        test_visibility <- "after_published"
+    # if(  grepl("\\(visible\\)", test_name) ){
+    #     test_visibility <- "visible"
+    # }else if( grepl("\\(hidden\\)", test_name) ){
+    #     test_visibility <- "hidden"
+    # }else if(  grepl("\\(after_due_date\\)", test_name) ){
+    #     test_visibility <- "after_due_date"
+    # }else if( grepl("\\(after_published\\)", test_name) ){
+    #     test_visibility <- "after_published"
+    # }else{
+    #     test_visibility <- "after_due_date"
+    # }
+    
+    if(  grepl("\\(hidden\\)", test_name) ){
+      test_visibility <- "hidden"
     }else{
-        test_visibility <- "after_due_date"
+      test_visibility <- "visible"
     }
     
     assertionResults <- raw_results[[i]]$results
