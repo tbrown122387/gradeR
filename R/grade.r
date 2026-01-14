@@ -298,12 +298,13 @@ calcGradesForGradescope <- function(submission_file,
         test_visibility <- "after_due_date"
     }
     
-    test_max_score <- 1 # TODO generalize
     assertionResults <- raw_results[[i]]$results
-    success <- all(sapply(assertionResults, methods::is, "expectation_success"))
-    test_score <- ifelse(success, 1, 0)
     
+    # Track scores at criterion level
+    test_score <- 0
+    test_max_score <- 0
     criterion_messages <- c()
+    
     for(j in seq_along(assertionResults)){
       assertion <- assertionResults[[j]]
       
@@ -328,11 +329,27 @@ calcGradesForGradescope <- function(submission_file,
         paste0("Criterion ", j)
       }
       
-      # Determine pass/fail status
+      # Extract point value from label (e.g., "[2pts]" or "(2pts)")
+      # Default to 1 point if not specified
+      pts_match <- regmatches(custom_msg, regexpr('\\[([0-9]+)pts?\\]|\\(([0-9]+)pts?\\)', custom_msg, perl = TRUE))
+      if(length(pts_match) > 0){
+        criterion_pts <- as.numeric(gsub('\\[|\\]|\\(|\\)|pts?', '', pts_match))
+        # Remove the point specification from the display message
+        custom_msg <- gsub('\\s*\\[([0-9]+)pts?\\]|\\s*\\(([0-9]+)pts?\\)', '', custom_msg)
+      } else {
+        criterion_pts <- 1
+      }
+      
+      test_max_score <- test_max_score + criterion_pts
+      
+      # Determine pass/fail status and update score
       if(methods::is(assertion, "expectation_success")){
-        criterion_messages <- c(criterion_messages, paste0("+1 (test passed): ", custom_msg))
+        test_score <- test_score + criterion_pts
+        criterion_messages <- c(criterion_messages, 
+                                paste0("+", criterion_pts, " (test passed): ", custom_msg))
       } else if(methods::is(assertion, "expectation_failure")){
-        criterion_messages <- c(criterion_messages, paste0('<span style="color: red;"><b>+0 (test failed): ', custom_msg, '</b></span>'))
+        criterion_messages <- c(criterion_messages, 
+                                paste0("+0 (*****test failed*****): ", custom_msg))
       }
     }
     
@@ -340,7 +357,7 @@ calcGradesForGradescope <- function(submission_file,
     if(length(criterion_messages) > 0){
       output_text <- paste(criterion_messages, collapse = "\n")
     } else {
-      output_text <- ifelse(success, "Test passed! 👍", "Test failed")
+      output_text <- "No criteria evaluated"
     }
     
     tests[["tests"]][[i]] <- list(name = test_name,
@@ -351,7 +368,7 @@ calcGradesForGradescope <- function(submission_file,
   }
   
   # now write out all the stuff to a json file
-  write(jsonlite::toJSON(tests, auto_unbox = T), file = json_filename)
+  write(jsonlite::toJSON(tests, auto_unbox = T, pretty = TRUE), file = json_filename)
 }
 
 
