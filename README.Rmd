@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 
 The goal of `gradeR` is to help grade bunches of `R` script assignment submissions. This package has two primary functions called `calcGrades()` and `calcGradesForGradescope`, and much of the testing functionality is taken from the `testthat` package.
 
+As of 2026, this package can now support R Markdown (`.rmd`) and Quarto (`.qmd`) submissions in addition to standard R scripts (`.R` or `.r`).
+
 ## Installation
 
 You can install the released version of `gradeR` from [CRAN](https://CRAN.R-project.org) with:
