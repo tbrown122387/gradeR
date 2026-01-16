@@ -199,7 +199,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
 #' The grading function for Gradescope.
 #'
 #' This function grades one R script assignment submission and writes results out to a properly-formatted json file for Gradescope. 
-#' @param submission_file the name of the assignment submission file (e.g. "hw1.r")
+#' @param submission_file the name of the assignment submission file (e.g. "hw1.r" or "hw1.qmd")
 #' @param test_file the name of the .r file with test_that tests (e.g. "hw1_tests.R")
 #' @param which_results Choose either "testing" or "gradescope" If equal to "gradescope" then the json file is written out to the directory that Gradescope expects. Otherwise, results.json is written to your current working directory.
 #' @param suppress_warnings If FALSE, warnings are fatal; if set to TRUE, then warnings will not prematurely terminate running of student submission scripts. 

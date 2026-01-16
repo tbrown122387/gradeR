@@ -12,7 +12,7 @@ calcGradesForGradescope(
 )
 }
 \arguments{
-\item{submission_file}{the name of the assignment submission file (e.g. "hw1.r")}
+\item{submission_file}{the name of the assignment submission file (e.g. "hw1.r" or "hw1.qmd")}
 
 \item{test_file}{the name of the .r file with test_that tests (e.g. "hw1_tests.R")}
 
