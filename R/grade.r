@@ -211,8 +211,8 @@ calcGradesForGradescope <- function(submission_file,
                                     suppress_warnings = TRUE){
   
   if(!(which_results %in% c("gradescope", "testing")))
-    stop("argument which_filename incorrectly specified")
-  json_filename <- ifelse(which_results == "gradescope", "/autograder/results/results.json", "results.json")
+    stop("argument which_results incorrectly specified")
+  json_file <- ifelse(which_results == "gradescope", "/autograder/results/results.json", "results.json")
   
   if(missing(test_file)) 
     stop("must have a test file")
@@ -222,11 +222,16 @@ calcGradesForGradescope <- function(submission_file,
   if(number_tests == 0)
     stop("you need at least one graded question")
   
+  # Validate submission file exists
+  if(!file.exists(submission_file))
+    stop("submission_file does not exist: ", submission_file)
+  
   # Check if submission is a Qmd/Rmd document
   file_ext <- tools::file_ext(submission_file)
   is_rmd_qmd <- tolower(file_ext) %in% c("qmd","rmd")
   
   # If Quarto, extract R code to temporary file
+  temp_r_file <- NULL
   if(is_rmd_qmd){
     temp_r_file <- tempfile(fileext = ".R")
     tryCatch({
@@ -235,6 +240,11 @@ calcGradesForGradescope <- function(submission_file,
     }, error = function(e){
       stop("Failed to extract R code from Rmd/Qmd document: ", e$message)
     })
+  }
+  
+  # Ensure cleanup of temp file on exit
+  if(!is.null(temp_r_file)){
+    on.exit(unlink(temp_r_file), add = TRUE)
   }
   
   # run student's submission in a separate process
@@ -274,7 +284,20 @@ calcGradesForGradescope <- function(submission_file,
   
 
   # test the student's submissions
-  # for the time being, each test is worth one point
+  # note that scriptResults might not exist if there was an error in the tryCatch block
+  if(!exists("scriptResults")){
+    # Create minimal failure output
+    tests <- list(tests = list(list(
+      name = "Script Execution",
+      score = 0,
+      max_score = number_tests,
+      visibility = "visible",
+      output = "Failed to execute student submission script due to errors."
+    )))
+    write(jsonlite::toJSON(tests, auto_unbox = TRUE, pretty = TRUE), file = json_file)
+    return(invisible(NULL))
+  }
+  
   lr <- testthat::ListReporter$new()
   out <- testthat::test_file(test_file, 
                              reporter = lr, 
@@ -368,7 +391,7 @@ calcGradesForGradescope <- function(submission_file,
   }
   
   # now write out all the stuff to a json file
-  write(jsonlite::toJSON(tests, auto_unbox = T, pretty = TRUE), file = json_filename)
+  write(jsonlite::toJSON(tests, auto_unbox = TRUE, pretty = TRUE), file = json_file)
 }
 
 
