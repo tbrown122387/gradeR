@@ -33,6 +33,201 @@ findBadEncodingFiles <- function(submission_dir){
 }
 
 
+#' Run a student script in an isolated environment.
+#'
+#' Internal helper function that runs a student's R script in a separate process
+#' with its own environment to avoid contaminating the current session.
+#' 
+#' @param script_path the full path to the student's R script
+#' @param suppress_warnings logical; if TRUE, warnings are suppressed
+#' @return The environment created by the script, or NULL if execution failed
+#' @keywords internal
+runStudentScript <- function(script_path, suppress_warnings = TRUE){
+  rogueScript <- function(source_file_path){
+    rogueEnv <- new.env()  
+    source(source_file_path, rogueEnv)
+    rogueEnv
+  }
+  
+  scriptResults <- NULL
+  if(suppress_warnings){
+    tryCatch(
+      suppressWarnings(scriptResults <- callr::r(rogueScript, 
+                                                 args = list(script_path), 
+                                                 show = TRUE, package = TRUE)),
+      error = function(e){
+        print(paste0("error: ", e$parent$call))
+        print(e$parent$trace)
+      },
+      message = function(m){
+        print(paste0("message: ", m))
+      })
+  }else{
+    tryCatch(
+      scriptResults <- callr::r(rogueScript, 
+                                args = list(script_path), 
+                                show = TRUE, package = TRUE),
+      error = function(e){
+        print(paste0("error: ", e$parent$call))
+        print(e$parent$trace)
+      },
+      message = function(m){
+        print(paste0("message: ", m))
+      },
+      warning = function(w){
+        print(paste0("warning: ", w))
+      })
+  }
+  
+  return(scriptResults)
+}
+
+
+#' Parse test results for a single student.
+#'
+#' Internal helper function that evaluates test results and returns scores.
+#' 
+#' @param test_results the ListReporter results object
+#' @param number_questions the number of questions/tests
+#' @return A numeric vector of scores (0 or 1 for each question)
+#' @keywords internal
+parseTestResults <- function(test_results, number_questions){
+  scores <- numeric(number_questions)
+  
+  for(q in seq_len(number_questions)){
+    assertionResults <- test_results$results$as_list()[[q]]$results
+    success <- all(sapply(assertionResults, 
+                          methods::is, 
+                          "expectation_success")) 
+    scores[q] <- if(success) 1 else 0
+  }
+  
+  return(scores)
+}
+
+
+#' Determine test visibility from test name.
+#'
+#' Internal helper function that extracts visibility setting from test names
+#' based on Gradescope conventions.
+#' 
+#' @param test_name the name of the test
+#' @return A string: "visible", "hidden", "after_due_date", or "after_published"
+#' @keywords internal
+getTestVisibility <- function(test_name){
+  if(grepl("\\(visible\\)", test_name)){
+    return("visible")
+  }else if(grepl("\\(hidden\\)", test_name)){
+    return("hidden")
+  }else if(grepl("\\(after_due_date\\)", test_name)){
+    return("after_due_date")
+  }else if(grepl("\\(after_published\\)", test_name)){
+    return("after_published")
+  }else{
+    return("after_due_date")
+  }
+}
+
+
+#' Extract criterion label from assertion.
+#'
+#' Internal helper function that extracts custom labels from test expectations.
+#' 
+#' @param assertion the expectation assertion object
+#' @param default_label fallback label if none found
+#' @return A string with the criterion label
+#' @keywords internal
+extractCriterionLabel <- function(assertion, default_label){
+  if(is.null(assertion$srcref)){
+    return(default_label)
+  }
+  
+  src_text <- paste(as.character(assertion$srcref), collapse = " ")
+  
+  if(!grepl('label\\s*=\\s*["\']', src_text)){
+    return(default_label)
+  }
+  
+  label_match <- regmatches(src_text, regexpr('label\\s*=\\s*["\']([^"\']+)["\']', src_text, perl = TRUE))
+  if(length(label_match) > 0){
+    sub('.*label\\s*=\\s*["\']([^"\']+)["\'].*', '\\1', label_match)
+  }else{
+    default_label
+  }
+}
+
+
+#' Extract point value from criterion message.
+#'
+#' Internal helper function that extracts point values from criterion labels
+#' formatted as "[2pts]" or "(2pts)".
+#' 
+#' @param criterion_msg the criterion message that may contain point specification
+#' @return A list with components: pts (numeric) and cleaned_msg (string without point spec)
+#' @keywords internal
+extractPointValue <- function(criterion_msg){
+  pts_match <- regmatches(criterion_msg, regexpr('\\[([0-9]+)pts?\\]|\\(([0-9]+)pts?\\)', criterion_msg, perl = TRUE))
+  
+  if(length(pts_match) > 0){
+    pts <- as.numeric(gsub('\\[|\\]|\\(|\\)|pts?', '', pts_match))
+    cleaned_msg <- gsub('\\s*\\[([0-9]+)pts?\\]|\\s*\\(([0-9]+)pts?\\)', '', criterion_msg)
+  }else{
+    pts <- 1
+    cleaned_msg <- criterion_msg
+  }
+  
+  list(pts = pts, cleaned_msg = cleaned_msg)
+}
+
+
+#' Process assertions for a single test.
+#'
+#' Internal helper function that processes all assertions for a test and
+#' computes scores and messages.
+#' 
+#' @param assertion_results list of assertion results from testthat
+#' @return A list with components: score, max_score, and output
+#' @keywords internal
+processTestAssertions <- function(assertion_results){
+  test_score <- 0
+  test_max_score <- 0
+  criterion_messages <- c()
+  
+  for(j in seq_along(assertion_results)){
+    assertion <- assertion_results[[j]]
+    
+    # Extract custom label or create default message
+    custom_msg <- extractCriterionLabel(assertion, paste0("Criterion ", j))
+    
+    # Extract point value from label
+    point_info <- extractPointValue(custom_msg)
+    criterion_pts <- point_info$pts
+    custom_msg <- point_info$cleaned_msg
+    
+    test_max_score <- test_max_score + criterion_pts
+    
+    # Determine pass/fail status and update score
+    if(methods::is(assertion, "expectation_success")){
+      test_score <- test_score + criterion_pts
+      criterion_messages <- c(criterion_messages, 
+                              paste0("+", criterion_pts, " (test passed): ", custom_msg))
+    }else if(methods::is(assertion, "expectation_failure")){
+      criterion_messages <- c(criterion_messages, 
+                              paste0("+0 (*****test failed*****): ", custom_msg))
+    }
+  }
+  
+  # Build output string
+  output_text <- if(length(criterion_messages) > 0){
+    paste(criterion_messages, collapse = "\n")
+  }else{
+    "No criteria evaluated"
+  }
+  
+  list(score = test_score, max_score = test_max_score, output = output_text)
+}
+
+
 #' This function finds files with global file paths.
 #'
 #'  A function that finds student submissions that refer to machine-specific file paths
@@ -109,83 +304,30 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
                            stringsAsFactors = F)
   
   student_num <- 1
-  for(path in paths ){
-    
-    # run student's submission in a separate process 
-    # https://stackoverflow.com/questions/63744905/attaching-packages-to-a-temporary-search-path-in-r/63746414#63746414
+  for(path in paths){
     tmp_full_path <- paste(submission_dir, path, sep = "")
     if(verbose) cat("grading: ", path, "\n")
-    # run student's submission in a separate process
-    # https://stackoverflow.com/a/63746414/1267833
-    rogueScript <- function(source_file_path){
-      rogueEnv <- new.env()  
-      source(source_file_path, rogueEnv)
-      rogueEnv
-    }
-    # remove previous scriptResults in case an error is triggered and it's never re-created
-    if( exists("scriptResults") ) rm(scriptResults)
     
-    if( suppress_warnings ){
-      tryCatch(
-        suppressWarnings(scriptResults <- callr::r(rogueScript, 
-                                                   args = list(tmp_full_path), 
-                                                   show = TRUE, package = TRUE)),
-        error = function(e){
-          print(paste0("error: ", e$parent$call))
-          print(e$parent$trace)
-        },
-        message = function(m){
-          print(paste0("message: ", m))
-        })
-    }else{ # not suppressing warnings
-      tryCatch(
-        scriptResults <- callr::r(rogueScript, 
-                                  args = list(tmp_full_path), 
-                                  show = TRUE, package = TRUE),
-        error = function(e){
-          print(paste0("error: ", e$parent$call))
-          print(e$parent$trace)
-        },
-        message = function(m){
-          print(paste0("message: ", m))
-        },
-        warning = function(w){
-          print(paste0("warning: ", w))
-        })
-    }
+    # Run student's submission in a separate process
+    scriptResults <- runStudentScript(tmp_full_path, suppress_warnings)
     
-    # test the student's submissions
-    # note that scriptResults might not exist if there was an error in the tryCatch block
-    if( exists("scriptResults") ){
+    # Test the student's submission
+    score_data[student_num, 1] <- tmp_full_path
+    
+    if(!is.null(scriptResults)){
       lr <- testthat::ListReporter$new()
       out <- testthat::test_file(your_test_file, 
                                  reporter = lr,
                                  env = scriptResults)
       
-      # parse the output
-      score_data[student_num,1] <- tmp_full_path
-      for(q in (1:number_questions)){
-        
-        # true or false if question was correct
-        assertionResults <- lr$results$as_list()[[q]]$results
-        success <- all(sapply(assertionResults, 
-                              methods::is, 
-                              "expectation_success")) 
-        
-        # TODO incorporate point values
-        if(success){
-          score_data[student_num, q+1] <- 1
-        }else{
-          score_data[student_num, q+1] <- 0
-        }
-      }
-      
+      # Parse the output and store scores
+      scores <- parseTestResults(lr, number_questions)
+      score_data[student_num, -1] <- scores
     }else{
       print("assigning all zeros for this student due to bug in submissions")
-      score_data[student_num,1] <- tmp_full_path
+      # Scores already initialized to 0
     }
     
-    # increment 
     student_num <- student_num + 1
   }
   
@@ -261,45 +403,11 @@ calcGradesForGradescope <- function(submission_file,
     on.exit(unlink(temp_r_file), add = TRUE)
   }
   
-  # run student's submission in a separate process
-  # https://stackoverflow.com/a/63746414/1267833
-  rogueScript <- function(source_file_path){
-    rogueEnv <- new.env()  
-    source(source_file_path, rogueEnv)
-    rogueEnv
-  }
-  if( suppress_warnings ){
-    tryCatch(
-      suppressWarnings(scriptResults <- callr::r(rogueScript, 
-                                                 args = list(submission_file), 
-                                                 show = TRUE, package = TRUE)),
-      error = function(e){
-        print(paste0("error: ", e$parent$call))
-        print(e$parent$trace)
-      },
-      message = function(m){
-        print(paste0("message: ", m))
-      })
-  }else{ # not suppressing warnings
-    tryCatch(
-      scriptResults <- callr::r(rogueScript, args = list(submission_file), show = TRUE, package = TRUE),
-      error = function(e){
-        print(paste0("error: ", e$parent$call))
-        print(e$parent$trace)
-      },
-      message = function(m){
-        print(paste0("message: ", m))
-      },
-      warning = function(w){
-        print(paste0("warning: ", w))
-      })
-  }
-
+  # Run student's submission in a separate process
+  scriptResults <- runStudentScript(submission_file, suppress_warnings)
   
-
-  # test the student's submissions
-  # note that scriptResults might not exist if there was an error in the tryCatch block
-  if(!exists("scriptResults")){
+  # Test the student's submissions
+  if(is.null(scriptResults)){
     # Create minimal failure output
     tests <- list(tests = list(list(
       name = "Script Execution",
@@ -320,88 +428,19 @@ calcGradesForGradescope <- function(submission_file,
   tests[["tests"]] <- list()
   raw_results <- lr$results$as_list()
   
-  for(i in 1:number_tests){
+  for(i in seq_len(number_tests)){
     test_name <- raw_results[[i]]$test
+    test_visibility <- getTestVisibility(test_name)
+    assertion_results <- raw_results[[i]]$results
     
-    if(  grepl("\\(visible\\)", test_name) ){
-        test_visibility <- "visible"
-    }else if( grepl("\\(hidden\\)", test_name) ){
-        test_visibility <- "hidden"
-    }else if(  grepl("\\(after_due_date\\)", test_name) ){
-        test_visibility <- "after_due_date"
-    }else if( grepl("\\(after_published\\)", test_name) ){
-        test_visibility <- "after_published"
-    }else{
-        test_visibility <- "after_due_date"
-    }
-    
-    assertionResults <- raw_results[[i]]$results
-    
-    # Track scores at criterion level
-    test_score <- 0
-    test_max_score <- 0
-    criterion_messages <- c()
-    
-    for(j in seq_along(assertionResults)){
-      assertion <- assertionResults[[j]]
-      
-      # Extract custom label or create default message
-      # The label is embedded in the srcref attribute
-      custom_msg <- if(!is.null(assertion$srcref)){
-        # Try to extract label from the source code
-        src_text <- paste(as.character(assertion$srcref), collapse = " ")
-        
-        # Look for label parameter in the expectation
-        if(grepl('label\\s*=\\s*["\']', src_text)){
-          label_match <- regmatches(src_text, regexpr('label\\s*=\\s*["\']([^"\']+)["\']', src_text, perl = TRUE))
-          if(length(label_match) > 0){
-            sub('.*label\\s*=\\s*["\']([^"\']+)["\'].*', '\\1', label_match)
-          } else {
-            paste0("Criterion ", j)
-          }
-        } else {
-          paste0("Criterion ", j)
-        }
-      } else {
-        paste0("Criterion ", j)
-      }
-      
-      # Extract point value from label (e.g., "[2pts]" or "(2pts)")
-      # Default to 1 point if not specified
-      pts_match <- regmatches(custom_msg, regexpr('\\[([0-9]+)pts?\\]|\\(([0-9]+)pts?\\)', custom_msg, perl = TRUE))
-      if(length(pts_match) > 0){
-        criterion_pts <- as.numeric(gsub('\\[|\\]|\\(|\\)|pts?', '', pts_match))
-        # Remove the point specification from the display message
-        custom_msg <- gsub('\\s*\\[([0-9]+)pts?\\]|\\s*\\(([0-9]+)pts?\\)', '', custom_msg)
-      } else {
-        criterion_pts <- 1
-      }
-      
-      test_max_score <- test_max_score + criterion_pts
-      
-      # Determine pass/fail status and update score
-      if(methods::is(assertion, "expectation_success")){
-        test_score <- test_score + criterion_pts
-        criterion_messages <- c(criterion_messages, 
-                                paste0("+", criterion_pts, " (test passed): ", custom_msg))
-      } else if(methods::is(assertion, "expectation_failure")){
-        criterion_messages <- c(criterion_messages, 
-                                paste0("+0 (*****test failed*****): ", custom_msg))
-      }
-    }
-    
-    # Build output string
-    if(length(criterion_messages) > 0){
-      output_text <- paste(criterion_messages, collapse = "\n")
-    } else {
-      output_text <- "No criteria evaluated"
-    }
+    # Process all assertions for this test
+    test_info <- processTestAssertions(assertion_results)
     
     tests[["tests"]][[i]] <- list(name = test_name,
-                                  score = test_score,
-                                  max_score = test_max_score,
+                                  score = test_info$score,
+                                  max_score = test_info$max_score,
                                   visibility = test_visibility,
-                                  output = output_text)
+                                  output = test_info$output)
   }
   
   # now write out all the stuff to a json file
