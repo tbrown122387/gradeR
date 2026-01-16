@@ -20,6 +20,9 @@ calcGrades(
 
 \item{verbose}{set to true if you want to print the name of the file as it's being ran}
 }
+\value{
+a data.frame of all the scores for each student
+}
 \description{
 This function grades a bunch of R script assignments
 }
