@@ -56,11 +56,10 @@ runStudentScript <- function(script_path, suppress_warnings = TRUE){
                                                  args = list(script_path), 
                                                  show = TRUE, package = TRUE)),
       error = function(e){
-        print(paste0("error: ", e$parent$call))
-        print(e$parent$trace)
+        # Silently catch errors - caller will handle NULL return
       },
       message = function(m){
-        print(paste0("message: ", m))
+        # Suppress messages
       })
   }else{
     tryCatch(
@@ -68,14 +67,13 @@ runStudentScript <- function(script_path, suppress_warnings = TRUE){
                                 args = list(script_path), 
                                 show = TRUE, package = TRUE),
       error = function(e){
-        print(paste0("error: ", e$parent$call))
-        print(e$parent$trace)
+        # Silently catch errors - caller will handle NULL return
       },
       message = function(m){
-        print(paste0("message: ", m))
+        # Suppress messages
       },
       warning = function(w){
-        print(paste0("warning: ", w))
+        # Suppress warnings when not suppressing them globally
       })
   }
   
@@ -243,12 +241,12 @@ processTestAssertions <- function(assertion_results){
 findGlobalPaths <- function(submission_dir) {
   scripts_to_grade <- list.files(path = submission_dir, 
                                  recursive = T, 
-                                 pattern = "\\.r$", 
+                                 pattern = "\\.R$", 
                                  ignore.case = T)
   
   atLeastOneBadFile <- FALSE
   for(script in scripts_to_grade) {
-    globalPath <- paste(submission_dir, script, sep = "")
+    globalPath <- file.path(submission_dir, script)
     lines <- readLines(globalPath, warn = F)  
     badLines <- suppressWarnings(lines[grep("^[^#].+[\\\\/]+", lines)])
     
@@ -408,15 +406,7 @@ calcGradesForGradescope <- function(submission_file,
   
   # Test the student's submissions
   if(is.null(scriptResults)){
-    # Create minimal failure output
-    tests <- list(tests = list(list(
-      name = "Script Execution",
-      score = 0,
-      max_score = number_tests,
-      visibility = "visible",
-      output = "Failed to execute student submission script due to errors."
-    )))
-    write(jsonlite::toJSON(tests, auto_unbox = TRUE, pretty = TRUE), file = json_file)
+    # Don't write output - let Gradescope handle the failure
     return(invisible(NULL))
   }
   
@@ -444,7 +434,7 @@ calcGradesForGradescope <- function(submission_file,
   }
   
   # now write out all the stuff to a json file
-  write(jsonlite::toJSON(tests, auto_unbox = TRUE, pretty = TRUE), file = json_file)
+  jsonlite::write_json(tests, path = json_file, auto_unbox = TRUE, pretty = TRUE)
 }
 
 

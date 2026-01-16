@@ -23,7 +23,17 @@ test_that("calcGrades produces correct output structure", {
   expect_equal(results[2, 1], "example/assignment1_submissions/student2/myhw1.r")
   
   # Check scores
-  expect_eqcalcGrades handles multiple questions correctly", {
+  expect_equal(results[1, 2], 1)
+  expect_equal(results[2, 2], 0)
+  expect_equal(results[1, 3], 1)
+  expect_equal(results[2, 3], 1)
+  
+  # Check column names
+  expect_true("id" %in% names(results))
+})
+
+
+test_that("calcGrades handles multiple questions correctly", {
   submissions <- "example2/assignment2_submissions/"
   my_test_file <- "example2/grade_hw2.R"
   results <- calcGrades(submissions, my_test_file, suppress_warnings = TRUE)
@@ -42,21 +52,11 @@ test_that("calcGrades produces correct output structure", {
   expect_equal(results[2, 1], "example2/assignment2_submissions/student2/myhw1.r")
   expect_equal(results[2, 2], 0)
   expect_equal(results[2, 3], 1)
-  expect_equal(results[2, 4], 0)  expect_equal(results[1,1], "example2/assignment2_submissions/student1/hw1.R")
-  expect_equal(results[1,2], 1)
-  expect_equal(results[1,3], 1)
-  expect_equal(results[1,4], 1)
-
-  # second student
-  expect_equal(results[2,1], "example2/assignment2_submissions/student2/myhw1.r")
-  expect_equal(results[2,2], 0)
-  expect_equal(results[2,3], 1)
-  expect_equal(results[2,4], 0)
-
+  expect_equal(results[2, 4], 0)
 })
 
-test_that("test bad args for gradescope function", {
-calcGrades handles multiple assertions per test", {
+
+test_that("calcGrades handles multiple assertions per test", {
   submissions <- "example3/assignment3_submissions/"
   my_test_file <- "example3/grade_hw3.R"
   results <- calcGrades(submissions, my_test_file, suppress_warnings = TRUE)
@@ -138,5 +138,5 @@ test_that("calcGrades error handling with suppress_warnings", {
   expect_true(is.data.frame(results_not_suppressed))
   
   # Results should be the same
-  expect_equal(results_suppressed, results_not_suppressed
-
+  expect_equal(results_suppressed, results_not_suppressed)
+})

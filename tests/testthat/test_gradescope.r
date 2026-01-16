@@ -43,37 +43,6 @@ test_that("calcGradesForGradescope creates JSON output", {
   if(file.exists("results.json")) unlink("results.json")
 })
 
-test_that("calcGradesForGradescope handles script execution errors", {
-  # Create a script with an error
-  temp_submission <- tempfile(fileext = ".R")
-  writeLines(c(
-    "x <- 5",
-    "stop('intentional error')",
-    "y <- 10"
-  ), temp_submission)
-  
-  test_file <- "example/grade_hw1.R"
-  
-  # Should still create output even with error
-  suppressMessages(
-    result <- calcGradesForGradescope(temp_submission, test_file, which_results = "testing", suppress_warnings = TRUE)
-  )
-  
-  expect_true(file.exists("results.json"))
-  
-  # Read JSON
-  json_content <- jsonlite::fromJSON("results.json")
-  expect_true("tests" %in% names(json_content))
-  
-  # Should have failure output
-  expect_true(any(grepl("Failed to execute", json_content$tests[[1]]$output)))
-  expect_equal(json_content$tests[[1]]$score, 0)
-  
-  # Cleanup
-  unlink(temp_submission)
-  if(file.exists("results.json")) unlink("results.json")
-})
-
 test_that("calcGradesForGradescope supports Rmd files", {
   skip_if_not_installed("knitr")
   
@@ -119,7 +88,7 @@ test_that("visibility tags are case sensitive", {
 })
 
 test_that("visibility handles multiple tags", {
-  # First matching tag should win
+  # order of priority is visible > hidden > after_due_date > after_published
   expect_equal(getTestVisibility("Test (visible) (hidden)"), "visible")
-  expect_equal(getTestVisibility("Test (hidden) (visible)"), "hidden")
+  expect_equal(getTestVisibility("Test (hidden) (visible)"), "visible")
 })

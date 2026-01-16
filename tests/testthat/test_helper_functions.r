@@ -31,7 +31,7 @@ test_that("runStudentScript returns NULL on error", {
   ), temp_script)
   
   # Capture output to suppress error messages
-  env <- suppressMessages(runStudentScript(temp_script, suppress_warnings = TRUE))
+  env <- suppressWarnings(runStudentScript(temp_script, suppress_warnings = TRUE))
   
   # Should return NULL when script fails
   expect_null(env)
@@ -50,13 +50,13 @@ test_that("runStudentScript handles warnings correctly", {
   ), temp_script)
   
   # With suppress_warnings = TRUE, should succeed
-  env1 <- suppressMessages(runStudentScript(temp_script, suppress_warnings = TRUE))
+  env1 <- suppressWarnings(runStudentScript(temp_script, suppress_warnings = TRUE))
   expect_false(is.null(env1))
   expect_equal(env1$x, 5)
   expect_equal(env1$y, 10)
   
   # With suppress_warnings = FALSE, should also succeed (warnings don't stop execution)
-  env2 <- suppressMessages(runStudentScript(temp_script, suppress_warnings = FALSE))
+  env2 <- suppressWarnings(runStudentScript(temp_script, suppress_warnings = FALSE))    
   expect_false(is.null(env2))
   expect_equal(env2$x, 5)
   expect_equal(env2$y, 10)
