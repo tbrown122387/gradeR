@@ -20,9 +20,8 @@ calculateOverallAverage(
 \item{studentNameCol}{a name of a column with student names.}
 
 \item{drop}{a list of named lists. See below for more information.}
-}
-\value{
-A \code{vector} of overall course averages, each element named with a student name.
+
+\item{traceCalcsForStudent}{Character scalar giving a student name, or NULL. If provided, additional intermediate calculations are printed for that student only (useful for debugging).}
 }
 \description{
 This function calculates each student's course average based on all of their assignments.
