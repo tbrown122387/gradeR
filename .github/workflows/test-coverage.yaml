@@ -28,7 +28,7 @@ jobs:
 
       - name: Test coverage
         run: |
-          covr::report()
+          covr::package_coverage()
         shell: Rscript {0}
 
       - name: Show testthat output

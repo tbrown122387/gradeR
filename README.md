@@ -4,7 +4,6 @@
 # gradeR
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/adsteen/gradeR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/adsteen/gradeR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of `gradeR` is to help grade bunches of `R` script assignment
