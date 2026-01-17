@@ -445,7 +445,7 @@ calcGradesForGradescope <- function(submission_file,
 #' @param categories a named list of named lists. See below for more information.
 #' @param studentNameCol a name of a column with student names.
 #' @param drop a list of named lists. See below for more information.
-#' @return A \code{vector} of overall course averages, each element named with a student name.
+#' @param traceCalcsForStudent Character scalar giving a student name, or NULL. If provided, additional intermediate calculations are printed for that student only (useful for debugging).
 #' @keywords calculateOverallAverage
 #' @export
 #' @examples
