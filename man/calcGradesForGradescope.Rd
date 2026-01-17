@@ -28,7 +28,7 @@ This function grades one R script assignment submission and writes results out t
 Supports R scripts (.r, .R) as well as R Markdown (.Rmd) and Quarto (.qmd) documents.
 }
 \examples{
-\donttest{
+\dontrun{
 # For local testing
 calcGradesForGradescope("student_hw1.r", "hw1_tests.R", which_results = "testing")
 

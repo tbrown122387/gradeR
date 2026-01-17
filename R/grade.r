@@ -349,7 +349,7 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
 #' @keywords calcGradesForGradescope Gradescope 
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # For local testing
 #' calcGradesForGradescope("student_hw1.r", "hw1_tests.R", which_results = "testing")
 #' 
@@ -438,211 +438,210 @@ calcGradesForGradescope <- function(submission_file,
 }
 
 
-#' The averaging function.
-#'
-#' This function calculates each student's course average based on all of their assignments.
-#' @param table a `data.frame` of student grades. 
-#' @param categories a named list of named lists. See below for more information.
-#' @param studentNameCol a name of a column with student names.
-#' @param drop a list of named lists. See below for more information.
-#' @param traceCalcsForStudent Character scalar giving a student name, or NULL. If provided, additional intermediate calculations are printed for that student only (useful for debugging).
-#' @keywords calculateOverallAverage
-#' @export
-#' @examples
-#' \donttest{
-#' exampleDF <- data.frame(student = c('a','b','c'),
-#'                         test1 = c(50,50,NA),
-#'                         test1LateAdjustment = c(.99,1,1),
-#'                         hw1=c(45,44,43),
-#'                         hw1LateAdjustment = c(1,1,1),
-#'                         hw2=c(50,49,48),
-#'                         hw2LateAdjustment = c(1,1,1))
-#' 
-#' testCols <- data.frame(gradeNames = 'test1', 
-#'                        lateNames = 'test1LateAdjustment', 
-#'                        maxScores = 50)
-#' testCategory <- list(colNames=testCols,
-#'                      catWeight=.6)
-#' hwCols <- data.frame(gradeNames = c('hw1','hw2'), 
-#'                      lateNames = c('hw1LateAdjustment','hw2LateAdjustment'),
-#'                      maxScores = c(50,50))
-#' homeworkCategory <- list(colNames=hwCols,
-#'                          catWeight=.4)
-#' 
-#' cats <- list(tests=testCategory, homeworks=homeworkCategory)
-#' myDrops = list(numToDrop=1, cats='homeworks')
-#' calculateOverallAverage(exampleDF, cats, 'student', myDrops)
-#' calculateOverallAverage(exampleDF, cats, 'student', myDrops, traceCalcsForStudent = 'a')
-#' }
-calculateOverallAverage <- function(table, categories, studentNameCol, 
-                                    drop = NULL, 
-                                    traceCalcsForStudent = NULL){
+# #' The averaging function.
+# #'
+# #' This function calculates each student's course average based on all of their assignments.
+# #' @param table a `data.frame` of student grades. 
+# #' @param categories a named list of named lists. See below for more information.
+# #' @param studentNameCol a name of a column with student names.
+# #' @param drop a list of named lists. See below for more information.
+# #' @param traceCalcsForStudent Character scalar giving a student name, or NULL. If provided, additional intermediate calculations are printed for that student only (useful for debugging).
+# #' @keywords calculateOverallAverage
+# #' @examples
+# #' \donttest{
+# #' exampleDF <- data.frame(student = c('a','b','c'),
+# #'                         test1 = c(50,50,NA),
+# #'                         test1LateAdjustment = c(.99,1,1),
+# #'                         hw1=c(45,44,43),
+# #'                         hw1LateAdjustment = c(1,1,1),
+# #'                         hw2=c(50,49,48),
+# #'                         hw2LateAdjustment = c(1,1,1))
+# #' 
+# #' testCols <- data.frame(gradeNames = 'test1', 
+# #'                        lateNames = 'test1LateAdjustment', 
+# #'                        maxScores = 50)
+# #' testCategory <- list(colNames=testCols,
+# #'                      catWeight=.6)
+# #' hwCols <- data.frame(gradeNames = c('hw1','hw2'), 
+# #'                      lateNames = c('hw1LateAdjustment','hw2LateAdjustment'),
+# #'                      maxScores = c(50,50))
+# #' homeworkCategory <- list(colNames=hwCols,
+# #'                          catWeight=.4)
+# #' 
+# #' cats <- list(tests=testCategory, homeworks=homeworkCategory)
+# #' myDrops = list(numToDrop=1, cats='homeworks')
+# #' calculateOverallAverage(exampleDF, cats, 'student', myDrops)
+# #' calculateOverallAverage(exampleDF, cats, 'student', myDrops, traceCalcsForStudent = 'a')
+# #' }
+# calculateOverallAverage <- function(table, categories, studentNameCol, 
+#                                     drop = NULL, 
+#                                     traceCalcsForStudent = NULL){
   
-  ######################
-  # reusable variables #
-  ######################
-  numStudents <- nrow(table)
-  catNames <- names(categories)
-  allAssignmentNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'gradeNames'))
-  allLateNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'lateNames'))
+#   ######################
+#   # reusable variables #
+#   ######################
+#   numStudents <- nrow(table)
+#   catNames <- names(categories)
+#   allAssignmentNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'gradeNames'))
+#   allLateNames <- unlist(lapply(lapply(categories, '[[', 'colNames'), '[[', 'lateNames'))
   
-  ###################
-  # performs checks #
-  ###################
-  # check weights sum to 1
-  stopifnot(sum(sapply(categories, '[[', 'catWeight')) == 1)
-  # check dropped categories all exist 
-  if(!is.null(drop)) stopifnot(all(drop$cats %in% names(categories)))
-  # TODO: check the number of drops is strictly less than the number of assignments to drop from
-  # check assignment names in categories all exist in data table
-  assignmentNamesInCats <- unlist(sapply(categories, '[[', 'colNames'))
-  stopifnot(all(allAssignmentNames %in% colnames(table)))
-  stopifnot(all(allLateNames %in% colnames(table)))
-  # TODO check no assignment is double-listed in two categorie
-  #TODO check dimension of maxScores in categories (and everything else)
-  # TODO check they're vector too
-  # lateMultColNames
-  
-  
-  # check names of drop
-  # document return value?
-  # TODO: check breakdown is a partition
-  # add option to see specific student process
+#   ###################
+#   # performs checks #
+#   ###################
+#   # check weights sum to 1
+#   stopifnot(sum(sapply(categories, '[[', 'catWeight')) == 1)
+#   # check dropped categories all exist 
+#   if(!is.null(drop)) stopifnot(all(drop$cats %in% names(categories)))
+#   # TODO: check the number of drops is strictly less than the number of assignments to drop from
+#   # check assignment names in categories all exist in data table
+#   assignmentNamesInCats <- unlist(sapply(categories, '[[', 'colNames'))
+#   stopifnot(all(allAssignmentNames %in% colnames(table)))
+#   stopifnot(all(allLateNames %in% colnames(table)))
+#   # TODO check no assignment is double-listed in two categorie
+#   #TODO check dimension of maxScores in categories (and everything else)
+#   # TODO check they're vector too
+#   # lateMultColNames
   
   
-  ###############################
-  # fill NA grades s with zeros #
-  ###############################
-  # TODO make this only work on grade columns
-  table[is.na(table)] <- 0
+#   # check names of drop
+#   # document return value?
+#   # TODO: check breakdown is a partition
+#   # add option to see specific student process
   
-  ##############################
-  # convert scores to percents #
-  # also deduct lateness       #
-  ##############################
-  for(myCat in categories){
+  
+#   ###############################
+#   # fill NA grades s with zeros #
+#   ###############################
+#   # TODO make this only work on grade columns
+#   table[is.na(table)] <- 0
+  
+#   ##############################
+#   # convert scores to percents #
+#   # also deduct lateness       #
+#   ##############################
+#   for(myCat in categories){
     
-    gradeColumnNames <- myCat$colNames$gradeNames
-    for(i in seq_along(gradeColumnNames) ){
+#     gradeColumnNames <- myCat$colNames$gradeNames
+#     for(i in seq_along(gradeColumnNames) ){
       
-      gradeColumnName <- gradeColumnNames[i]
-      maxScore <- myCat$colNames$maxScores[i]
-      stopifnot(length(maxScore) == 1)
+#       gradeColumnName <- gradeColumnNames[i]
+#       maxScore <- myCat$colNames$maxScores[i]
+#       stopifnot(length(maxScore) == 1)
       
-      haveLatenessCol <- !is.null(myCat$colNames$lateNames[i])
-      if( haveLatenessCol ){
-        lateMultColumnName <- myCat$colNames$lateNames[i]
-        table[[gradeColumnName]] <- table[[gradeColumnName]] * table[[lateMultColumnName]]
-        table[[gradeColumnName]] <- table[[gradeColumnName]] / maxScore *100
-      }else{
-        table[[gradeColumnName]] <- table[[gradeColumnName]]/ maxScore *100
-      }
-    }
-  }
-  gradesOnlyDF <- subset(table, select = allAssignmentNames)
+#       haveLatenessCol <- !is.null(myCat$colNames$lateNames[i])
+#       if( haveLatenessCol ){
+#         lateMultColumnName <- myCat$colNames$lateNames[i]
+#         table[[gradeColumnName]] <- table[[gradeColumnName]] * table[[lateMultColumnName]]
+#         table[[gradeColumnName]] <- table[[gradeColumnName]] / maxScore *100
+#       }else{
+#         table[[gradeColumnName]] <- table[[gradeColumnName]]/ maxScore *100
+#       }
+#     }
+#   }
+#   gradesOnlyDF <- subset(table, select = allAssignmentNames)
   
-  ####################################
-  # group data frame into categories #
-  ####################################
-  # https://stackoverflow.com/a/70319902/1267833
-  breakdown <- lapply(lapply(categories, '[[', 'colNames'), '[[', 'gradeNames')
-  map <- rep.int(names(breakdown), lengths(breakdown))
-  names(map) <- unlist(breakdown)
-  indicesForBy <- map[allAssignmentNames]
-  gradesByCategory <- by(t(gradesOnlyDF), indicesForBy, function(x) x, simplify = FALSE)
+#   ####################################
+#   # group data frame into categories #
+#   ####################################
+#   # https://stackoverflow.com/a/70319902/1267833
+#   breakdown <- lapply(lapply(categories, '[[', 'colNames'), '[[', 'gradeNames')
+#   map <- rep.int(names(breakdown), lengths(breakdown))
+#   names(map) <- unlist(breakdown)
+#   indicesForBy <- map[allAssignmentNames]
+#   gradesByCategory <- by(t(gradesOnlyDF), indicesForBy, function(x) x, simplify = FALSE)
   
-  ########################################
-  # create a data.frame for each student #
-  ########################################
-  gradesByStudent <- lapply(seq.int(numStudents),
-                            function(stud_num) lapply(gradesByCategory, '[', , stud_num ))
-  names(gradesByStudent) <- table[[studentNameCol]]
-  gradesByStudent <- lapply(gradesByStudent,
-                            function(x) as.data.frame(stack(x)) )
-  if( is.character(traceCalcsForStudent) ){
-    print("---------------------")
-    print(paste("grades for", traceCalcsForStudent, "after lateness adjustment"))
-    print("---------------------")
-    print(gradesByStudent[[traceCalcsForStudent]])
-  }
+#   ########################################
+#   # create a data.frame for each student #
+#   ########################################
+#   gradesByStudent <- lapply(seq.int(numStudents),
+#                             function(stud_num) lapply(gradesByCategory, '[', , stud_num ))
+#   names(gradesByStudent) <- table[[studentNameCol]]
+#   gradesByStudent <- lapply(gradesByStudent,
+#                             function(x) as.data.frame(utils::stack(x)) )
+#   if( is.character(traceCalcsForStudent) ){
+#     print("---------------------")
+#     print(paste("grades for", traceCalcsForStudent, "after lateness adjustment"))
+#     print("---------------------")
+#     print(gradesByStudent[[traceCalcsForStudent]])
+#   }
   
   
-  ##################################################################
-  # sort each student by "negotiable points lost" for each student #
-  ##################################################################
-  addColsSort <- function(df){
-    # add category weights
-    catWeights <- sapply(categories[as.character(gradesByStudent[[1]]$ind)],
-                         '[[',
-                         'catWeight')
-    df$catWeights <- catWeights
+#   ##################################################################
+#   # sort each student by "negotiable points lost" for each student #
+#   ##################################################################
+#   addColsSort <- function(df){
+#     # add category weights
+#     catWeights <- sapply(categories[as.character(gradesByStudent[[1]]$ind)],
+#                          '[[',
+#                          'catWeight')
+#     df$catWeights <- catWeights
     
-    # add dropable column
-    if( is.null(drop) ){
-      df$droppable <- FALSE
-    }else{ # have drops
-      df$droppable <- df$ind %in% drop$cats
-    }
+#     # add dropable column
+#     if( is.null(drop) ){
+#       df$droppable <- FALSE
+#     }else{ # have drops
+#       df$droppable <- df$ind %in% drop$cats
+#     }
     
-    # add points lost
-    # pointsLostNegotiably lost should be 0 if the assignment isn't droppable
-    df$ind <- as.character(df$ind)
-    numAssignmentsInEachCat <- tapply(df$values, df$ind, length)
-    numAssignmentsInEachCat <- numAssignmentsInEachCat[df$ind]
-    df$pointsLostNegotiably <- df$catWeights*(100-df$values)/numAssignmentsInEachCat
-    df$pointsLostNegotiably <- df$pointsLostNegotiably * df$droppable
+#     # add points lost
+#     # pointsLostNegotiably lost should be 0 if the assignment isn't droppable
+#     df$ind <- as.character(df$ind)
+#     numAssignmentsInEachCat <- tapply(df$values, df$ind, length)
+#     numAssignmentsInEachCat <- numAssignmentsInEachCat[df$ind]
+#     df$pointsLostNegotiably <- df$catWeights*(100-df$values)/numAssignmentsInEachCat
+#     df$pointsLostNegotiably <- df$pointsLostNegotiably * df$droppable
     
-    # sort df, drop assignments, return scores only
-    df <- df[order(df$pointsLostNegotiably, decreasing = T),]
-  }
-  gradesByStudent <- lapply(gradesByStudent, addColsSort)
-  if( is.character(traceCalcsForStudent) ){
-    print("---------------------")
-    print(paste("grades for", traceCalcsForStudent))
-    print("---------------------")
-    print(gradesByStudent[[traceCalcsForStudent]])
-  }
+#     # sort df, drop assignments, return scores only
+#     df <- df[order(df$pointsLostNegotiably, decreasing = T),]
+#   }
+#   gradesByStudent <- lapply(gradesByStudent, addColsSort)
+#   if( is.character(traceCalcsForStudent) ){
+#     print("---------------------")
+#     print(paste("grades for", traceCalcsForStudent))
+#     print("---------------------")
+#     print(gradesByStudent[[traceCalcsForStudent]])
+#   }
   
   
-  ###################
-  # drop bad scores #
-  ###################
-  dropBadScores <- function(df){
-    if(is.null(drop)){
-      keptScores <-  1:(nrow(df))
-    }else{
-      keptScores <- (drop$numToDrop+1):(nrow(df))
-    }
-    df <- subset(df[keptScores,], select = c(values, ind, catWeights))
+#   ###################
+#   # drop bad scores #
+#   ###################
+#   dropBadScores <- function(df){
+#     if(is.null(drop)){
+#       keptScores <-  1:(nrow(df))
+#     }else{
+#       keptScores <- (drop$numToDrop+1):(nrow(df))
+#     }
+#     df <- subset(df[keptScores,], select = c(values, ind, catWeights))
     
-    # recompute number of assignments in each category
-    # because some may have dropped
-    df$ind <- as.character(df$ind)
-    lengthEachCat <- tapply(df$values, df$ind, length)
-    df$numAssignmentsInEachCat <- lengthEachCat[df$ind]
+#     # recompute number of assignments in each category
+#     # because some may have dropped
+#     df$ind <- as.character(df$ind)
+#     lengthEachCat <- tapply(df$values, df$ind, length)
+#     df$numAssignmentsInEachCat <- lengthEachCat[df$ind]
     
-    df
-  }
-  gradesByStudent <- lapply(gradesByStudent, dropBadScores)
-  if( is.character(traceCalcsForStudent) ){
-    print("---------------------")
-    print(paste("grades for", traceCalcsForStudent))
-    print("---------------------")
-    print(gradesByStudent[[traceCalcsForStudent]])
-  }
+#     df
+#   }
+#   gradesByStudent <- lapply(gradesByStudent, dropBadScores)
+#   if( is.character(traceCalcsForStudent) ){
+#     print("---------------------")
+#     print(paste("grades for", traceCalcsForStudent))
+#     print("---------------------")
+#     print(gradesByStudent[[traceCalcsForStudent]])
+#   }
   
-  ############################
-  # return  overall averages #
-  ############################
-  finalAverages <- sapply(gradesByStudent, function(df){
-    sum(df$values * df$catWeights / df$numAssignmentsInEachCat)
-  })
-  if( is.character(traceCalcsForStudent) ){
-    print("---------------------")
-    print(paste("final grade for", traceCalcsForStudent))
-    print("---------------------")
-    print(finalAverages[[traceCalcsForStudent]])
-  }
-  return(finalAverages)
-}
+#   ############################
+#   # return  overall averages #
+#   ############################
+#   finalAverages <- sapply(gradesByStudent, function(df){
+#     sum(df$values * df$catWeights / df$numAssignmentsInEachCat)
+#   })
+#   if( is.character(traceCalcsForStudent) ){
+#     print("---------------------")
+#     print(paste("final grade for", traceCalcsForStudent))
+#     print("---------------------")
+#     print(finalAverages[[traceCalcsForStudent]])
+#   }
+#   return(finalAverages)
+# }
 
