@@ -1,3 +1,20 @@
+# gradeR 2.0.1
+
+## Enhancements
+
+Added a new function, `getTestScriptReport`, that counts the number of test cases in a given test script and produces a formatted score report. This should allow instructors to audit their test scripts and determine maximum possible point values when configuring their autograder assignments.
+
+# gradeR 2.0.0
+
+## Enhancements
+
+`calcGradesForGradescope` has been substantially rewritten:
+
+- Can now process R Markdown and Quarto files in addition to R scripts.
+- Messages for individual test cases can now be customized using the `label` property of any `expect_*` function within the `testthat` package.
+- Point values for individual tests can now be customized by adding strings like "[2pts]" to the aforementioned `label` property.
+- Code has been refactored into smaller reusable pieces for better testing.
+
 # gradeR 1.0.10
 
 ## Bug fixes
