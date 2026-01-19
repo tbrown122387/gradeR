@@ -1,10 +1,11 @@
 Package: gradeR
-Title: Helps Grade Assignment Submissions in common R formats
+Title: Helps Grade Assignment Submissions in Common R Formats
 Version: 2.0.1
 Authors@R: c(
-    person("Taylor", "Brown", email = "trb5me@virginia.edu", role = c("aut", "cre")),
+    person("Taylor", "Brown", email = "trb5me@virginia.edu", role = c("aut", "cre"), 
+	   comment = c(ORCID = "0000-0003-4972-6251", GitHub = "tbrown122387")),
     person("Pete", "Benbow", email = "pebenbow@davidson.edu", role = "ctb",
-           comment = c(ORCID = "", GitHub = "pebenbow"))
+           comment = c(ORCID = "0009-0006-0505-7411", GitHub = "pebenbow"))
     )
 Description: After being given the location of your students' submissions and a test file, the function runs each file that is an R script, R Markdown file, or Quarto document, and evaluates the results from all the given tests. Results are neatly returned in a data frame that has a row for each student, and a column for each test.
 Depends: R (>= 3.4)

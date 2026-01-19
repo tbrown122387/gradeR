@@ -4,12 +4,12 @@ citHeader("To cite gradeR in publications use:")
 
 bibentry(
   bibtype = "Manual",
-  title   = "gradeR: Helps Grade Assignment Submissions in common R formats",
+  title   = "gradeR: Helps Grade Assignment Submissions in Common R Formats",
   author  = c(
     person(given = "Taylor", family = "Brown", email = "trb5me@virginia.edu", role = c("aut", "cre")),
     person(given = "Pete",   family = "Benbow", email = "pebenbow@davidson.edu", role = "ctb")
   ),
   year    = format(Sys.Date(), "%Y"),
-  note    = paste("R package version", as.character(utils::packageVersion("gradeR"))),
+  note    = "R package version 2.0.1",
   url     = "https://github.com/tbrown122387/gradeR"
 )

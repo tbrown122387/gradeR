@@ -4,16 +4,16 @@
 \name{gradeR-package}
 \alias{gradeR}
 \alias{gradeR-package}
-\title{gradeR: Helps Grade Assignment Submissions in common R formats}
+\title{gradeR: Helps Grade Assignment Submissions in Common R Formats}
 \description{
 After being given the location of your students' submissions and a test file, the function runs each file that is an R script, R Markdown file, or Quarto document, and evaluates the results from all the given tests. Results are neatly returned in a data frame that has a row for each student, and a column for each test.
 }
 \author{
-\strong{Maintainer}: Taylor Brown \email{trb5me@virginia.edu}
+\strong{Maintainer}: Taylor Brown \email{trb5me@virginia.edu} (\href{https://orcid.org/0000-0003-4972-6251}{ORCID}) (tbrown122387)
 
 Other contributors:
 \itemize{
-  \item Pete Benbow \email{pebenbow@davidson.edu} (\href{https://orcid.org/}{ORCID}) (pebenbow) [contributor]
+  \item Pete Benbow \email{pebenbow@davidson.edu} (\href{https://orcid.org/0009-0006-0505-7411}{ORCID}) (pebenbow) [contributor]
 }
 
 }
