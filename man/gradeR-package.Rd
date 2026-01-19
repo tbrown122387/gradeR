@@ -4,9 +4,9 @@
 \name{gradeR-package}
 \alias{gradeR}
 \alias{gradeR-package}
-\title{gradeR: Helps Grade Assignment Submissions in common R formats}
+\title{gradeR: Helps Grade Assignment Submissions that are R Scripts}
 \description{
-After being given the location of your students' submissions and a test file, the function runs each file that is an R script, R Markdown file, or Quarto document, and evaluates the results from all the given tests. Results are neatly returned in a data frame that has a row for each student, and a column for each test.
+After being given the location of your students' submissions and a test file, the function runs each .R file, and evaluates the results from all the given tests. Results are neatly returned in a data frame that has a row for each student, and a column for each test.
 }
 \author{
 \strong{Maintainer}: Taylor Brown \email{trb5me@virginia.edu}
