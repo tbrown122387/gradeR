@@ -442,8 +442,8 @@ calcGradesForGradescope <- function(submission_file,
 #' The function for analyzing and summarizing R test scripts.
 #'
 #' This function scans a given test script and summarizes the number of tests and test criteria in the script, as well as point values.
-#' @param test_file the name of the .r file with test_that tests (e.g. "hw1_tests.R")
-#' @keywords getTestScriptReport  
+#' @param script_path the name of the .r file containing tests tests (e.g. "hw1_tests.R")
+#' @keywords getTestScriptReport getPrettyReport
 #' @export
 getTestScriptReport <- function(script_path) {
   # Read and parse the R script
@@ -540,7 +540,12 @@ getTestScriptReport <- function(script_path) {
       criteria_per_test[[test_count]] <- criteria_count
       
       # Sum points for this test
-      test_points <- sum(sapply(expect_calls, function(x) x$points))
+      #test_points <- sum(sapply(expect_calls, function(x) x$points))
+      test_points <- if (length(expect_calls) > 0) {
+        sum(sapply(expect_calls, function(x) x$points))
+      } else {
+        0
+      }
       
       # Count each expect_ function type
       for (call in expect_calls) {
@@ -585,8 +590,8 @@ getTestScriptReport <- function(script_path) {
 #'
 #' This function is used inside the getTestScriptReport function to produce a formatted report as output.
 #' @param report a list object that is produced from the getTestScriptReport function
-#' @keywords getPrettyReport getTestScriptReport 
-#' @export
+#' @param script_path a string representing the relative path to the test script
+#' @keywords internal
 getPrettyReport <- function(report, script_path) {
   cat("=", rep("=", 60), "=\n", sep = "")
   cat("TEST SCRIPT ANALYSIS REPORT\n")

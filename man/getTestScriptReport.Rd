@@ -7,9 +7,10 @@
 getTestScriptReport(script_path)
 }
 \arguments{
-\item{test_file}{the name of the .r file with test_that tests (e.g. "hw1_tests.R")}
+\item{script_path}{the name of the .r file containing tests tests (e.g. "hw1_tests.R")}
 }
 \description{
 This function scans a given test script and summarizes the number of tests and test criteria in the script, as well as point values.
 }
+\keyword{getPrettyReport}
 \keyword{getTestScriptReport}

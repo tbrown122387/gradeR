@@ -8,9 +8,10 @@ getPrettyReport(report, script_path)
 }
 \arguments{
 \item{report}{a list object that is produced from the getTestScriptReport function}
+
+\item{script_path}{a string representing the relative path to the test script}
 }
 \description{
 This function is used inside the getTestScriptReport function to produce a formatted report as output.
 }
-\keyword{getPrettyReport}
-\keyword{getTestScriptReport}
+\keyword{internal}
