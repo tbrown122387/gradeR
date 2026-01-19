@@ -12,16 +12,32 @@ calcGradesForGradescope(
 )
 }
 \arguments{
-\item{submission_file}{the name of the assignment submission file (e.g. "hw1.r")}
+\item{submission_file}{the path to the assignment submission file (e.g. "hw1.r", "hw1.Rmd", or "hw1.qmd"). For Rmd/Qmd files, R code will be automatically extracted.}
 
-\item{test_file}{the name of the .r file with test_that tests (e.g. "hw1_tests.R")}
+\item{test_file}{the path to the .r file with test_that tests (e.g. "hw1_tests.R")}
 
-\item{which_results}{Choose either "testing" or "gradescope" If equal to "gradescope" then the json file is written out to the directory that Gradescope expects. Otherwise, results.json is written to your current working directory.}
+\item{which_results}{Choose either "testing" or "gradescope". If equal to "gradescope", the json file is written to /autograder/results/results.json. Otherwise, results.json is written to your current working directory.}
 
-\item{suppress_warnings}{If FALSE, warnings are fatal; if set to TRUE, then warnings will not prematurely terminate running of student submission scripts.}
+\item{suppress_warnings}{If FALSE, warnings are fatal; if set to TRUE, warnings will not prematurely terminate running of student submission scripts.}
+}
+\value{
+Invisibly returns NULL. The function's primary purpose is the side effect of writing a JSON results file.
 }
 \description{
 This function grades one R script assignment submission and writes results out to a properly-formatted json file for Gradescope.
+Supports R scripts (.r, .R) as well as R Markdown (.Rmd) and Quarto (.qmd) documents.
+}
+\examples{
+\dontrun{
+# For local testing
+calcGradesForGradescope("student_hw1.r", "hw1_tests.R", which_results = "testing")
+
+# For Gradescope autograder (inside Gradescope environment)
+# calcGradesForGradescope("hw1.r", "hw1_tests.R", which_results = "gradescope")
+
+# Works with R Markdown files too
+# calcGradesForGradescope("student_hw1.Rmd", "hw1_tests.R", which_results = "testing")
+}
 }
 \keyword{Gradescope}
 \keyword{calcGradesForGradescope}

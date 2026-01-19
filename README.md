@@ -4,7 +4,6 @@
 # gradeR
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of `gradeR` is to help grade bunches of `R` script assignment

@@ -6,3 +6,5 @@ Meta
 .RData
 scratch/*
 results.json
+.Rproj.user/
+..Rcheck/
