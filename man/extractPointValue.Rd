@@ -14,6 +14,11 @@ A list with components: pts (numeric) and cleaned_msg (string without point spec
 }
 \description{
 Internal helper function that extracts point values from criterion labels
-formatted as "[2pts]" or "(2pts)".
+formatted as "[2pts]" or "(2pts)" (the trailing "s" is optional, e.g. "[2pt]"
+also works). The label itself comes from \code{\link{extractCriterionLabel}},
+i.e. from the \code{label = "..."} argument of an individual \code{expect_*()}
+call -- not from the enclosing \code{test_that()} block's name. If no point
+specification is found, the criterion defaults to 1 point and the message is
+returned unchanged.
 }
 \keyword{internal}

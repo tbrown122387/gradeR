@@ -13,7 +13,12 @@ processTestAssertions(assertion_results)
 A list with components: score, max_score, and output
 }
 \description{
-Internal helper function that processes all assertions for a test and
-computes scores and messages.
+Internal helper function that processes all assertions (i.e. \code{expect_*()}
+calls) for a single \code{test_that()} block and computes scores and messages.
+Each assertion is its own criterion, worth the point value returned by
+\code{\link{extractPointValue}} (1 point by default, or a custom amount via
+\code{label = "... [Npts]"}). \code{max_score} for the test is the sum of its
+criteria's point values, and \code{score} is the sum of the point values of the
+criteria that passed.
 }
 \keyword{internal}

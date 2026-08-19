@@ -11,6 +11,22 @@ getTestScriptReport(script_path)
 }
 \description{
 This function scans a given test script and summarizes the number of tests and test criteria in the script, as well as point values.
+Points are read the same way \code{\link{calcGradesForGradescope}} reads them: from
+\code{label = "... [Npts]"} arguments on individual \code{expect_*()} calls, defaulting
+to 1 point per \code{expect_*()} call when no \code{[Npts]}/\code{(Npts)} tag is present.
+Run this on a test file \emph{before} uploading it to Gradescope so you know what total
+max score to enter for the assignment (the "Total points" line of the printed report).
+}
+\value{
+Invisibly returns a list with components \code{summary} (total tests, criteria,
+and points), \code{criteria_per_test}, \code{expect_function_counts}, and \code{test_details}.
+Called primarily for its printed report, produced via \code{\link{getPrettyReport}}.
+}
+\examples{
+\donttest{
+my_test_file <- system.file("extdata/example", "grade_hw1.R", package = "gradeR")
+getTestScriptReport(my_test_file)
+}
 }
 \keyword{getPrettyReport}
 \keyword{getTestScriptReport}

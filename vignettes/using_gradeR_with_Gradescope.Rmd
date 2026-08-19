@@ -27,6 +27,25 @@ The autograding code for each Gradescope assignment is comprised of several file
 
 2. The file with all of the tests. This can have any name you want, and it will usually change depending on what assignment you're grading. In this example, we call it [`assignment1_grading_file.r`](https://github.com/tbrown122387/Using-gradeR-for-the-Gradescope-Autograder/blob/master/autograding_code_and_data/assignment1_tests.r). This file contains `testthat` tests, which is another `R` package that `gradeR` depends on. The example should be pretty self explanatory, but for those looking for more detail, see the original `gradeR` vignette, or the documentation for the [`testthat` package](https://testthat.r-lib.org/). Note that by default, each test case has its visibility set to "after_due_date." If you would like a test to be visible to the students before the deadline has passed, make sure to include the phrase `(visible)` in the name of the particular test. Other options include `(hidden)` and `(after_published)`. For more information on visibility options, see the Gradescope documentation available [here.](https://gradescope-autograders.readthedocs.io/en/latest/specs/#output-format)
 
+## Assigning Point Values to Tests
+
+Each `test_that()` block becomes one graded question on Gradescope, and by default every `expect_*()` call inside it is worth 1 point. If you want some questions to be worth more than others, you set that **inside the individual `expect_*()` calls**, not in the name of the `test_that()` block.
+
+Do this by passing a `label` argument to the `expect_*()` call, with a tag like `[2pts]` or `(2pts)` (the trailing `s` is optional) somewhere in the string:
+
+```r
+test_that("p1a (visible)", {
+  expect_true(is.numeric(p1a), label = "p1a is numeric [1pts]")
+  expect_equal(p1a, 42,        label = "p1a has the correct value [3pts]")
+})
+```
+
+This block is worth 4 points total (1 + 3), and the `label` text (with the `[Npts]` tag stripped off) becomes the message shown to the student for that criterion on Gradescope. If an `expect_*()` call has no `label`, it defaults to a message like "Criterion 1" and is worth 1 point.
+
+A common mistake is to put the `[Npts]` tag in the *name* of the `test_that()` block instead, e.g. `test_that("p1a (visible) [2pts]", ...)`. That has no effect on scoring — the `test_that()` name only controls visibility (`(visible)`, `(hidden)`, etc.), never points.
+
+Before you upload a test file to Gradescope, run `gradeR::getTestScriptReport("your_test_file.R")` on it locally. It prints a breakdown of every test, its criteria, and their point values, along with a running total — use that total as the "max score" you enter for the assignment on Gradescope.
+
 3. The `.R` file that grades a single student submission. This can be named anything you want, too, but we call it [`grade_one_submission.r`](https://github.com/tbrown122387/Using-gradeR-for-the-Gradescope-Autograder/blob/master/autograding_code_and_data/grade_one_submission.r). Thanks to `gradeR`, this one is pretty simple--it just calls `gradeR::calcGradesForGradescope()`. This function runs a single student's submission, checks it against the provided `testthat` tests, and nicely formats the output in a way that Gradescope expects. 
 
 4. `run_autograder` is another Bash script that Gradescope's Linux servers run. This file must have this name, because Gradescope expects this. This small program is run every time a single student submission needs to be graded. It copies a single student submission into the directory that the Gradescope server expects, and then it runs the previously-mentioned file (`grade_one_submission.R`). 
@@ -59,4 +78,4 @@ There are a few things to do when you customize this to your own assignment:
 
 6. Double check your test visibilities. Remember, by default all tests are only shown after the due date has passed. If you would like a test to be visible, just insert the phrase "(visible)" into the name of the test file. For example, that is done on the first test [here.](https://github.com/tbrown122387/Using-gradeR-for-the-Gradescope-Autograder/blob/master/autograding_code_and_data/assignment1_tests.r). Personally, I usually make a few of the easy tests visible, just to make sure that students know before the deadline that "Gradescope" was able to run their script successfully.
 
-7. Make sure the max score you enter on Gradescope is the same as the total number of tests you have. 
+7. Make sure the max score you enter on Gradescope matches the **total point value** of your test file, not just the number of `test_that()` blocks. If every `expect_*()` call is left at its default of 1 point, these are the same number — but as soon as you customize any point values (see "Assigning Point Values to Tests" above), they diverge. Run `gradeR::getTestScriptReport("your_test_file.R")` locally to get the correct total before entering it on Gradescope.

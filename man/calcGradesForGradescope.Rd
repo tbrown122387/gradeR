@@ -27,6 +27,34 @@ Invisibly returns NULL. The function's primary purpose is the side effect of wri
 This function grades one R script assignment submission and writes results out to a properly-formatted json file for Gradescope.
 Supports R scripts (.r, .R) as well as R Markdown (.Rmd) and Quarto (.qmd) documents.
 }
+\details{
+Each \code{test_that()} block in \code{test_file} becomes one row in the Gradescope
+results table. Two things about a \code{test_that()} block are controlled by strings
+embedded in its \strong{name} (the first argument to \code{test_that()}):
+\itemize{
+  \item \strong{Visibility}, via \code{(visible)}, \code{(hidden)}, \code{(after_due_date)},
+  or \code{(after_published)} -- see \code{\link{getTestVisibility}}. If none is present,
+  the test defaults to \code{"after_due_date"}.
+}
+Point values, on the other hand, are \emph{not} read from the \code{test_that()} name.
+Instead, each individual \code{expect_*()} call inside the block is its own "criterion"
+worth 1 point by default. To customize a criterion's point value (and its message),
+pass \code{label = "your message [Npts]"} to that \code{expect_*()} call -- see
+\code{\link{extractPointValue}}. A test's \code{max_score} on Gradescope is the sum of
+its criteria's point values, so a block with three \code{expect_*()} calls worth
+\code{[1pts]}, \code{[2pts]}, and unlabeled (1 pt) is worth 4 points total. For example:
+
+\preformatted{
+test_that("p1a (visible)", {
+  expect_true(is.numeric(p1a), label = "p1a is numeric [1pts]")
+  expect_equal(p1a, 42, label = "p1a has the correct value [3pts]")
+})
+}
+
+Before uploading a test file to Gradescope, use \code{\link{getTestScriptReport}} on it
+to see the total point value across all tests -- that total is what you should enter as
+the assignment's max score on Gradescope.
+}
 \examples{
 \dontrun{
 # For local testing
@@ -38,6 +66,9 @@ calcGradesForGradescope("student_hw1.r", "hw1_tests.R", which_results = "testing
 # Works with R Markdown files too
 # calcGradesForGradescope("student_hw1.Rmd", "hw1_tests.R", which_results = "testing")
 }
+}
+\seealso{
+\code{\link{getTestScriptReport}} to preview a test file's tests and point totals before uploading it to Gradescope.
 }
 \keyword{Gradescope}
 \keyword{calcGradesForGradescope}

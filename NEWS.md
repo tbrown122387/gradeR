@@ -4,6 +4,14 @@
 
 Added a new function, `getTestScriptReport`, that counts the number of test cases in a given test script and produces a formatted score report. This should allow instructors to audit their test scripts and determine maximum possible point values when configuring their autograder assignments.
 
+## Bug fixes
+
+`getTestScriptReport()` was silently discarding its own return value (it returned whatever `cat()` inside the internal pretty-printer produced, which is always `NULL`, instead of the summarized report list). It now returns the report list invisibly, so it can be used programmatically (e.g. `report <- getTestScriptReport("hw1_tests.R"); report$summary$total_points`) in addition to printing.
+
+## Documentation
+
+Clarified, in both vignettes and in `?calcGradesForGradescope`, that per-test point values are set via `label = "... [Npts]"` on individual `expect_*()` calls -- not by adding `[Npts]` to the `test_that()` block's name, which only ever affects the block's Gradescope visibility. This distinction previously existed only in this NEWS file.
+
 # gradeR 2.0.0
 
 ## Enhancements

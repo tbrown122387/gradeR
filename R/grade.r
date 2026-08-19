@@ -130,7 +130,13 @@ getTestVisibility <- function(test_name){
 #' Extract criterion label from assertion.
 #'
 #' Internal helper function that extracts custom labels from test expectations.
-#' 
+#' It reads the source code of a single \code{expect_*()} call (via its \code{srcref})
+#' and looks for a \code{label = "..."} argument, e.g. \code{expect_true(x, label = "x is truthy")}.
+#' This is where \code{\link{calcGradesForGradescope}} gets the per-criterion message
+#' (and, after \code{\link{extractPointValue}} strips it out, the per-criterion point value)
+#' shown for each \code{expect_*()} call in the Gradescope output. It has nothing to do with
+#' the name of the enclosing \code{test_that()} block.
+#'
 #' @param assertion the expectation assertion object
 #' @param default_label fallback label if none found
 #' @return A string with the criterion label
@@ -158,8 +164,13 @@ extractCriterionLabel <- function(assertion, default_label){
 #' Extract point value from criterion message.
 #'
 #' Internal helper function that extracts point values from criterion labels
-#' formatted as "[2pts]" or "(2pts)".
-#' 
+#' formatted as "[2pts]" or "(2pts)" (the trailing "s" is optional, e.g. "[2pt]"
+#' also works). The label itself comes from \code{\link{extractCriterionLabel}},
+#' i.e. from the \code{label = "..."} argument of an individual \code{expect_*()}
+#' call -- not from the enclosing \code{test_that()} block's name. If no point
+#' specification is found, the criterion defaults to 1 point and the message is
+#' returned unchanged.
+#'
 #' @param criterion_msg the criterion message that may contain point specification
 #' @return A list with components: pts (numeric) and cleaned_msg (string without point spec)
 #' @keywords internal
@@ -180,9 +191,14 @@ extractPointValue <- function(criterion_msg){
 
 #' Process assertions for a single test.
 #'
-#' Internal helper function that processes all assertions for a test and
-#' computes scores and messages.
-#' 
+#' Internal helper function that processes all assertions (i.e. \code{expect_*()}
+#' calls) for a single \code{test_that()} block and computes scores and messages.
+#' Each assertion is its own criterion, worth the point value returned by
+#' \code{\link{extractPointValue}} (1 point by default, or a custom amount via
+#' \code{label = "... [Npts]"}). \code{max_score} for the test is the sum of its
+#' criteria's point values, and \code{score} is the sum of the point values of the
+#' criteria that passed.
+#'
 #' @param assertion_results list of assertion results from testthat
 #' @return A list with components: score, max_score, and output
 #' @keywords internal
@@ -340,22 +356,50 @@ calcGrades <- function(submission_dir, your_test_file, suppress_warnings = TRUE,
 #'
 #' This function grades one R script assignment submission and writes results out to a properly-formatted json file for Gradescope.
 #' Supports R scripts (.r, .R) as well as R Markdown (.Rmd) and Quarto (.qmd) documents.
-#' 
+#'
+#' Each \code{test_that()} block in \code{test_file} becomes one row in the Gradescope
+#' results table. Two things about a \code{test_that()} block are controlled by strings
+#' embedded in its \strong{name} (the first argument to \code{test_that()}):
+#' \itemize{
+#'   \item \strong{Visibility}, via \code{(visible)}, \code{(hidden)}, \code{(after_due_date)},
+#'   or \code{(after_published)} -- see \code{\link{getTestVisibility}}. If none is present,
+#'   the test defaults to \code{"after_due_date"}.
+#' }
+#' Point values, on the other hand, are \emph{not} read from the \code{test_that()} name.
+#' Instead, each individual \code{expect_*()} call inside the block is its own "criterion"
+#' worth 1 point by default. To customize a criterion's point value (and its message),
+#' pass \code{label = "your message [Npts]"} to that \code{expect_*()} call -- see
+#' \code{\link{extractPointValue}}. A test's \code{max_score} on Gradescope is the sum of
+#' its criteria's point values, so a block with three \code{expect_*()} calls worth
+#' \code{[1pts]}, \code{[2pts]}, and unlabeled (1 pt) is worth 4 points total. For example:
+#'
+#' \preformatted{
+#' test_that("p1a (visible)", {
+#'   expect_true(is.numeric(p1a), label = "p1a is numeric [1pts]")
+#'   expect_equal(p1a, 42, label = "p1a has the correct value [3pts]")
+#' })
+#' }
+#'
+#' Before uploading a test file to Gradescope, use \code{\link{getTestScriptReport}} on it
+#' to see the total point value across all tests -- that total is what you should enter as
+#' the assignment's max score on Gradescope.
+#'
 #' @param submission_file the path to the assignment submission file (e.g. "hw1.r", "hw1.Rmd", or "hw1.qmd"). For Rmd/Qmd files, R code will be automatically extracted.
 #' @param test_file the path to the .r file with test_that tests (e.g. "hw1_tests.R")
 #' @param which_results Choose either "testing" or "gradescope". If equal to "gradescope", the json file is written to /autograder/results/results.json. Otherwise, results.json is written to your current working directory.
 #' @param suppress_warnings If FALSE, warnings are fatal; if set to TRUE, warnings will not prematurely terminate running of student submission scripts.
 #' @return Invisibly returns NULL. The function's primary purpose is the side effect of writing a JSON results file.
-#' @keywords calcGradesForGradescope Gradescope 
+#' @seealso \code{\link{getTestScriptReport}} to preview a test file's tests and point totals before uploading it to Gradescope.
+#' @keywords calcGradesForGradescope Gradescope
 #' @export
 #' @examples
 #' \dontrun{
 #' # For local testing
 #' calcGradesForGradescope("student_hw1.r", "hw1_tests.R", which_results = "testing")
-#' 
+#'
 #' # For Gradescope autograder (inside Gradescope environment)
 #' # calcGradesForGradescope("hw1.r", "hw1_tests.R", which_results = "gradescope")
-#' 
+#'
 #' # Works with R Markdown files too
 #' # calcGradesForGradescope("student_hw1.Rmd", "hw1_tests.R", which_results = "testing")
 #' }
@@ -442,9 +486,22 @@ calcGradesForGradescope <- function(submission_file,
 #' The function for analyzing and summarizing R test scripts.
 #'
 #' This function scans a given test script and summarizes the number of tests and test criteria in the script, as well as point values.
+#' Points are read the same way \code{\link{calcGradesForGradescope}} reads them: from
+#' \code{label = "... [Npts]"} arguments on individual \code{expect_*()} calls, defaulting
+#' to 1 point per \code{expect_*()} call when no \code{[Npts]}/\code{(Npts)} tag is present.
+#' Run this on a test file \emph{before} uploading it to Gradescope so you know what total
+#' max score to enter for the assignment (the "Total points" line of the printed report).
 #' @param script_path the name of the .r file containing tests tests (e.g. "hw1_tests.R")
+#' @return Invisibly returns a list with components \code{summary} (total tests, criteria,
+#' and points), \code{criteria_per_test}, \code{expect_function_counts}, and \code{test_details}.
+#' Called primarily for its printed report, produced via \code{\link{getPrettyReport}}.
 #' @keywords getTestScriptReport getPrettyReport
 #' @export
+#' @examples
+#' \donttest{
+#' my_test_file <- system.file("extdata/example", "grade_hw1.R", package = "gradeR")
+#' getTestScriptReport(my_test_file)
+#' }
 getTestScriptReport <- function(script_path) {
   # Read and parse the R script
   script_content <- readLines(script_path, warn = FALSE)
@@ -581,9 +638,9 @@ getTestScriptReport <- function(script_path) {
     test_details = test_details
   )
   
-  pretty_report <- getPrettyReport(report, script_path)
-  
-  return(pretty_report)
+  getPrettyReport(report, script_path)
+
+  return(invisible(report))
 }
 
 #' The function prints a formatted test script analysis.

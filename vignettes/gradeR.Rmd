@@ -87,6 +87,8 @@ test_that("1.1a",{
 
 For a complete list of all available `expect_*` functions, see [`testthat`'s documentation](https://testthat.r-lib.org/reference/index.html).
 
+Note that the `label` arguments used above (e.g. `label = "myVector sums to 6"`) are optional here and are not used by `calcGrades()` -- a test either passes or fails as a whole. They matter if this same test file is later used with `calcGradesForGradescope()` (see the ["Using gradeR with Gradescope" vignette](https://cran.r-project.org/package=gradeR/vignettes/using_gradeR_with_Gradescope.html)), where each `label` becomes the message shown for that criterion, and a tag like `label = "myVector sums to 6 [2pts]"` sets that criterion's point value.
+
 
 ## A Fully-Worked Example
 

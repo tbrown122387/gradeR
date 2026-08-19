@@ -16,5 +16,11 @@ A string with the criterion label
 }
 \description{
 Internal helper function that extracts custom labels from test expectations.
+It reads the source code of a single \code{expect_*()} call (via its \code{srcref})
+and looks for a \code{label = "..."} argument, e.g. \code{expect_true(x, label = "x is truthy")}.
+This is where \code{\link{calcGradesForGradescope}} gets the per-criterion message
+(and, after \code{\link{extractPointValue}} strips it out, the per-criterion point value)
+shown for each \code{expect_*()} call in the Gradescope output. It has nothing to do with
+the name of the enclosing \code{test_that()} block.
 }
 \keyword{internal}
